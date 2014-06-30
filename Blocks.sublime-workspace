@@ -1,0 +1,1026 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"mouseCLi",
+				"mouseClickEvent"
+			],
+			[
+				"const",
+				"constraints"
+			],
+			[
+				"be",
+				"behaviors"
+			],
+			[
+				"beh",
+				"behavior"
+			],
+			[
+				"removeall",
+				"removeAllConstraints"
+			],
+			[
+				"arg",
+				"argumentsList"
+			],
+			[
+				"vari",
+				"variableNamesList"
+			],
+			[
+				"var",
+				"variableObject"
+			],
+			[
+				"vid",
+				"videoAlias"
+			],
+			[
+				"defa",
+				"defaultValue"
+			],
+			[
+				"BLOCKEV",
+				"BLOCKEVENT"
+			],
+			[
+				"BLOCK",
+				"BLOCKEVENT"
+			],
+			[
+				"Even",
+				"EVENT"
+			],
+			[
+				"deful",
+				"defaultValue"
+			],
+			[
+				"vali",
+				"validationResult"
+			],
+			[
+				"Inte",
+				"INTEGER"
+			],
+			[
+				"defaul",
+				"defaultValue"
+			],
+			[
+				"createArra",
+				"createArrayParamHeaderValidationMessage"
+			],
+			[
+				"create",
+				"createArrayParamValidationMessage"
+			],
+			[
+				"ARRAY",
+				"ARRAYOFBOOLEAN"
+			],
+			[
+				"valid",
+				"validatedValue"
+			],
+			[
+				"curr",
+				"currentParamIndex"
+			],
+			[
+				"curren",
+				"currentFunctionName"
+			],
+			[
+				"res",
+				"restPatternStartIndex"
+			],
+			[
+				"para",
+				"parameterIndex"
+			],
+			[
+				"get",
+				"getCallerFunctionName"
+			],
+			[
+				"defau",
+				"defaultList"
+			],
+			[
+				"NUM",
+				"NUMBER"
+			],
+			[
+				"NUMB",
+				"NUMBER_DEFAULT"
+			],
+			[
+				"I",
+				"INTEGER_DEFAULT"
+			],
+			[
+				"onl",
+				"onloadEventListenerAdded"
+			],
+			[
+				"ls",
+				"lastAlignment"
+			],
+			[
+				"trak",
+				"trackAlias"
+			],
+			[
+				"mask",
+				"maskMode"
+			],
+			[
+				"mak",
+				"maskMode"
+			],
+			[
+				"filter",
+				"filterAliases"
+			],
+			[
+				"resetmas",
+				"resetMaskForMovie"
+			],
+			[
+				"filt",
+				"filterAliases"
+			],
+			[
+				"filterA",
+				"filterAliases"
+			],
+			[
+				"movei",
+				"movieFrameAliases"
+			],
+			[
+				"mov",
+				"movieName"
+			],
+			[
+				"addImage",
+				"addImageFilterToMovie"
+			],
+			[
+				"addColo",
+				"addColorFilterToMovie"
+			],
+			[
+				"mo",
+				"movieName"
+			],
+			[
+				"movien",
+				"movieNameToFilter"
+			],
+			[
+				"movi",
+				"movieName"
+			],
+			[
+				"movieFram",
+				"movieFrameAliases"
+			],
+			[
+				"current",
+				"currentFrameIndex"
+			],
+			[
+				"movieF",
+				"movieFrameAliases"
+			],
+			[
+				"fram",
+				"frameIndex"
+			],
+			[
+				"react",
+				"reactFunctionName"
+			],
+			[
+				"origin",
+				"originY"
+			],
+			[
+				"disp",
+				"display"
+			],
+			[
+				"togg",
+				"toggleTypeable"
+			],
+			[
+				"tog",
+				"toggleTypeable"
+			],
+			[
+				"addTran",
+				"addTransformationsToMatrix"
+			],
+			[
+				"writ",
+				"writeObject"
+			],
+			[
+				"toggle",
+				"toggleObjectSleepState"
+			],
+			[
+				"CA",
+				"CANVASMANAGER"
+			],
+			[
+				"currentm",
+				"currentMemoryIndex"
+			],
+			[
+				"pr",
+				"prototype"
+			],
+			[
+				"memo",
+				"memory"
+			],
+			[
+				"curre",
+				"currentFrameIndex"
+			],
+			[
+				"getn",
+				"getNthLatestMemory"
+			],
+			[
+				"lastKeyna",
+				"lastKeyNamePress"
+			],
+			[
+				"lastKeyc",
+				"lastKeyCodePress"
+			],
+			[
+				"rotat",
+				"rotationAcc"
+			],
+			[
+				"roat",
+				"rotationVel"
+			],
+			[
+				"mem",
+				"memoryCapacity"
+			],
+			[
+				"new",
+				"newestMemoryIndex"
+			],
+			[
+				"or",
+				"originY"
+			],
+			[
+				"ori",
+				"originX"
+			],
+			[
+				"origi",
+				"originY"
+			],
+			[
+				"orig",
+				"originY"
+			],
+			[
+				"lastkey",
+				"lastKeyCodeUp"
+			],
+			[
+				"key",
+				"keyCode"
+			],
+			[
+				"isk",
+				"isKeyCodeLowercase"
+			],
+			[
+				"is",
+				"isKeyCodeUppercase"
+			],
+			[
+				"offset",
+				"offsetHeight"
+			],
+			[
+				"append",
+				"appendChild"
+			],
+			[
+				"auio",
+				"audioXMLfilename"
+			],
+			[
+				"loadI",
+				"loadAudioAssetXML"
+			],
+			[
+				"audioasse",
+				"audioAssetsFound"
+			],
+			[
+				"loadImag",
+				"loadImageAssetXML"
+			],
+			[
+				"imageass",
+				"imageAssetsFound"
+			],
+			[
+				"au",
+				"audioAssetsLoaded"
+			],
+			[
+				"audioass",
+				"audioAssetsFound"
+			],
+			[
+				"im",
+				"imageAssetsLoaded"
+			],
+			[
+				"image",
+				"imageAssetsFound"
+			],
+			[
+				"textImage",
+				"textImageData"
+			],
+			[
+				"textIm",
+				"textImage"
+			],
+			[
+				"pro",
+				"prototype"
+			],
+			[
+				"canvas",
+				"CanvasFrame"
+			],
+			[
+				"assetslo",
+				"assetsLoadedEvent"
+			],
+			[
+				"cu",
+				"currentMovie"
+			],
+			[
+				"cur",
+				"currentMovie"
+			],
+			[
+				"set",
+				"setFrameData"
+			],
+			[
+				"movie",
+				"movieName"
+			],
+			[
+				"m",
+				"movieName"
+			],
+			[
+				"movief",
+				"movieFrameAliases"
+			],
+			[
+				"getStrin",
+				"getStringFromKeyCodes"
+			],
+			[
+				"Key",
+				"KEYCODES"
+			],
+			[
+				"addmouse",
+				"addMouseClickBehavior"
+			],
+			[
+				"Erro",
+				"ERROR"
+			],
+			[
+				"logT",
+				"logThreshold"
+			],
+			[
+				"return",
+				"returnHomeByFraction"
+			],
+			[
+				"frame",
+				"frameData"
+			],
+			[
+				"proto",
+				"prototype"
+			],
+			[
+				"bloc",
+				"blockClusterPositions"
+			],
+			[
+				"img",
+				"imgDataArray"
+			],
+			[
+				"working",
+				"workingCanvasFrame"
+			],
+			[
+				"butt",
+				"butterflyCount"
+			],
+			[
+				"addR",
+				"addRandomFilter"
+			],
+			[
+				"ang",
+				"angularVelUpdate"
+			],
+			[
+				"update",
+				"updateWorkingImageArray"
+			],
+			[
+				"workingI",
+				"workingImageArray"
+			],
+			[
+				"work",
+				"workingCanvasFrame"
+			],
+			[
+				"wo",
+				"workingCanvasFrame"
+			],
+			[
+				"ca",
+				"CANVASMANAGER"
+			],
+			[
+				"cente",
+				"centery"
+			],
+			[
+				"cent",
+				"centerx"
+			],
+			[
+				"w",
+				"width"
+			],
+			[
+				"z",
+				"z-index"
+			],
+			[
+				"Cav",
+				"CANVASMANAGER"
+			],
+			[
+				"imgd",
+				"imgDataArrayCopy"
+			],
+			[
+				"bu",
+				"Butterfly1"
+			],
+			[
+				"su",
+				"subscribedFunctions"
+			],
+			[
+				"start",
+				"startUpFunction"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "Source/Utilities.js",
+			"settings":
+			{
+				"buffer_size": 47745,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Source/KeyboardEvent.js",
+			"settings":
+			{
+				"buffer_size": 10202,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "tempindex.html",
+			"settings":
+			{
+				"buffer_size": 16914,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "pg_languagetest.html",
+			"settings":
+			{
+				"buffer_size": 4241,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Symphori/Google Drive/BlocksV2/Gruntfile.js",
+			"settings":
+			{
+				"buffer_size": 2767,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Symphori/Google Drive/BlocksV2/package.json",
+			"settings":
+			{
+				"buffer_size": 244,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/Symphori/Google Drive/BlocksV2/package.json",
+		"/C/xampp/htdocs/BlocksV2/blankslate.html",
+		"/D/Users/Symphori/Before Crash/My Dreams/Cloud Kingdoms/StoryTimeline.doc",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/BlockEvent.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/Block.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_CinemaBlock_Shatter.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_MovieBlock_Shatter.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/ActorBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/SmokeTestBehaviors.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/MovieBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/CinemaBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/MouseEvent.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_CinemaBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_CinemaBlock_MouseEvents.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/Utilities.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_MovieBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_MovieBlock_MouseEvents.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/CanvasManager.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/PlayerBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/ParagraphBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/VideoBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_VideoBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_ImageParagraphBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_ParagraphBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_ImageTextBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_TextBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/StereoBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/ImageParagraphBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/TextBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/ImageTextBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/Video.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/SoundBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/AudioTrack.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/Event.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/KeyboardEvent.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/Memory.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/AssetManager.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/CanvasFrame.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/MaskBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/smokeTestConstraints.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_7_VideoBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/videoXMLsmoketest.xml",
+		"/C/Users/Symphori/Google Drive/BlocksV2/audioXMLsmoketest.xml",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_6_ImageParagraphBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_5_ParagraphBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_4_ImageTextBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_3_TextBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_4_ImageTextBlock_Memory - Copy.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_2_CinemaBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_1_MovieBlock_Memory.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/CinemaMaskBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Source/MovieMaskBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/imgXMLsmoketest.xml",
+		"/C/Users/Symphori/Google Drive/BlocksV2/blankslate.html",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Event.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/BlockEvent.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/MouseEvent.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/CanvasFrame.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/AudioTrack.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/AssetManager.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/CanvasManager.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/MovieBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/TextBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/ImageTextBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/ActorBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Block.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/KeyboardEvent.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Utilities.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/CinemaBlock.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/SmokeTestBehaviors.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/smokeTestConstraints.js",
+		"/C/Users/Symphori/Google Drive/BlocksV2/Blocks.sublime-project",
+		"/C/Users/Symphori/Desktop/Blocks/audioXMLsmoketest.xml",
+		"/C/Users/Symphori/Desktop/Blocks/imgXMLsmoketest.xml",
+		"/C/Users/Symphori/Desktop/Blocks/smokeTestConstraints.js",
+		"/C/Users/Symphori/Desktop/Blocks/SmokeTestBehaviors.js",
+		"/C/Users/Symphori/Desktop/Blocks/blankslate.html",
+		"/C/Users/Symphori/Desktop/Blocks/smoketest.html",
+		"/C/Users/Symphori/Desktop/Blocks/MouseEvent.js",
+		"/C/Users/Symphori/Desktop/Blocks/BlockEvent.js",
+		"/C/Users/Symphori/Desktop/Blocks/Event.js",
+		"/C/Users/Symphori/Desktop/Blocks/AssetManager.js",
+		"/C/Users/Symphori/Desktop/Blocks/AudioTrack.js",
+		"/C/Users/Symphori/Desktop/Blocks/CanvasFrame.js",
+		"/C/Users/Symphori/Desktop/Blocks/CanvasManager.js",
+		"/C/Users/Symphori/Desktop/Blocks/Utilities.js",
+		"/C/Users/Symphori/Desktop/Blocks/KeyboardEvent.js",
+		"/C/Users/Symphori/Desktop/Blocks/Block.js",
+		"/C/Users/Symphori/Desktop/Blocks/ActorBlock.js",
+		"/C/Users/Symphori/Desktop/Blocks/ImageTextBlock.js",
+		"/C/Users/Symphori/Desktop/CanvasTextEffects/js/DOMMetrics.js",
+		"/C/Users/Symphori/AppData/Local/Temp/Temp1_BlocksV2_03_21_13.zip/Event.js",
+		"/C/Users/Symphori/Desktop/Blocks/FixedTextBlock.js",
+		"/C/Users/Symphori/Desktop/Blocks/FixedTextBlock",
+		"/C/Users/Symphori/Google Drive/Blocks/Globals.js",
+		"/C/Users/Symphori/Google Drive/Blocks/index.html",
+		"/C/Users/Symphori/Google Drive/Blocks/Block.js",
+		"/C/Users/Symphori/Google Drive/Blocks/Behaviors.js"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"keysPressedSubscribedTo",
+			"isSubscribedToMouseMove",
+			"createFrameData",
+			"setFrameData",
+			"updateFrames",
+			"moveObjectInTime",
+			"keyEvent",
+			"matrix",
+			"defaults",
+			"putAsleep",
+			"this.isPlaying",
+			"applyforceright",
+			"CinemaBlock",
+			"MovieBlock",
+			"this.movieMasks",
+			"this.windowMasks",
+			"this.masks",
+			"applyRandomColorFilter",
+			"keyUpSubscribedFunctions",
+			"keyDownSubscribedFunctions",
+			"keyPressSubscribedFunctions",
+			"subscribedBlocks",
+			"func)",
+			"subscribedFunctions",
+			"FixedTextBlock",
+			"toggle",
+			"before ",
+			"updateFrames",
+			"isMouseEventWithinBlock",
+			"createButterfly",
+			"images",
+			"MovieBlock",
+			"dest",
+			"keyUpBehaviors",
+			"keyDownBehaviors",
+			"mouseUpBehaviors",
+			"mouseDownBehaviors",
+			"mouseClickBehaviors",
+			"mouseOutBehaviors",
+			"mouseOverBehaviors",
+			"keySubscribedFunctions",
+			"currentFrame",
+			"workingImageArray",
+			"workingImageDataArray",
+			"console.log"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"keyboardEvent",
+			"CinemaMaskBlock",
+			"MovieMaskBlock",
+			"this.movieWindowMasks",
+			"this.windowMasks",
+			"keyUpSubscribedBlocks",
+			"keyDownSubscribedBlocks",
+			"keyPressSubscribedBlocks",
+			"subscribedBlockFunctionPairs",
+			"block)",
+			"subscribedBlocks",
+			"ImageTextBlock",
+			"audioTracks",
+			"CinemaBlock",
+			"keyUpReactions",
+			"keyDownReactions",
+			"mouseUpReactions",
+			"mouseDownReactions",
+			"mouseClickReactions",
+			"mouseOutReactions",
+			"mouseOverReactions",
+			"keyDownSubscribedFunctions",
+			"currentFrameIndex",
+			"frames",
+			"frameData",
+			"frames",
+			"trace"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "Source/Utilities.js",
+					"settings":
+					{
+						"buffer_size": 47745,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4581.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Source/KeyboardEvent.js",
+					"settings":
+					{
+						"buffer_size": 10202,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10200,
+								10200
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3999.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "tempindex.html",
+					"settings":
+					{
+						"buffer_size": 16914,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "pg_languagetest.html",
+					"settings":
+					{
+						"buffer_size": 4241,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								993,
+								993
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/Users/Symphori/Google Drive/BlocksV2/Gruntfile.js",
+					"settings":
+					{
+						"buffer_size": 2767,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								2767
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/C/Users/Symphori/Google Drive/BlocksV2/package.json",
+					"settings":
+					{
+						"buffer_size": 244,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								244,
+								244
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 278.0,
+	"status_bar_visible": true
+}
