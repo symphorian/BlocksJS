@@ -7,7 +7,7 @@ var CinemaBlock = function() {
 	PARAMS.validateArguments([PARAMS.REST, PARAMS.STRING, PARAMS.ARRAYOFSTRING], arguments);
 
 	LOG.write("CinemaBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	this.movieFrameAliases = new Object();
 
@@ -37,16 +37,11 @@ var CinemaBlock = function() {
 	this.currentFrameIndex = -1;
 
 	this.maskMode = "none";
-
-	var shattered = false;
-
-	this._getShattered = function() { return shattered; };
-	this._setShattered = function(val) { shattered = val; };
-
-	this.shattered = shattered;
 }
 
-CinemaBlock.prototype = new PlayerBlock();
+CinemaBlock.prototype = new ActorBlock();
+CinemaBlock.prototype.learn(PlayerTraits);
+CinemaBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -136,61 +131,6 @@ CinemaBlock.prototype.stop = function() {
 	this.pause();
 }
 
-// // Private function
-// // Input parameters: none
-// // Returns: nothing
-// // Description: function for internal use, populates the frameData property with imgData from this object's image aliases
-// CinemaBlock.prototype.createFrameData = function() {
-// 	for (var movieName in this.movieFrameAliases) {
-// 		var imgDataArray = CANVASMANAGER.getImageAssetData(this.movieFrameAliases[movieName]);
-// 		var imgDataArrayCopy = new Array();
-
-// 		for (var i = 0; i < imgDataArray.length; i++) {
-// 			var copy = CANVASMANAGER.workingCanvasFrame.context.createImageData(imgDataArray[i].width, imgDataArray[i].height);
-// 			copy.data.set(imgDataArray[i].data);
-// 			imgDataArrayCopy[i] = copy;
-// 		}
-
-// 		this.movieFrameData[movieName] = imgDataArrayCopy;
-// 	}
-// }
-
-// // Public function
-// // Input parameters: movieName string, an array of imgData objects
-// // Returns: nothing
-// // Description: function for external use, populates the frameData property with the input parameter for the specified movie
-// // currently only used to populate imgData for child blocks when shattering a block object
-// CinemaBlock.prototype.setFrameData = function(movieName, imgDataArray) {
-// 	this.movieFrameData[movieName] = imgDataArray;
-// 	if (this.currentMovie == "") {
-// 		this.currentMovie = movieName;
-// 	}
-// }
-
-// // Public function
-// // Input parameters: none
-// // Returns: nothing
-// // Description: function for external use, 
-// // transforms the imgData from the frameData property of the object into images for the frames property
-// // currently only used to update child blocks when shattering a block object
-// CinemaBlock.prototype.updateFrames = function() {
-// 	//this.frames.splice(0,this.frames.length);
-// 	for (var movieName in this.movieFrameData) {
-// 		for (var i = 0; i < this.movieFrameData[movieName].length; i++) {
-// 			CANVASMANAGER.workingCanvasFrame.resize(this.movieFrameData[movieName][i].width,this.movieFrameData[movieName][i].height,-1);
-// 			CANVASMANAGER.workingCanvasFrame.context.clearRect(0,0,this.movieFrameData[movieName][i].width,this.movieFrameData[movieName][i].height);
-// 			CANVASMANAGER.workingCanvasFrame.context.putImageData(this.movieFrameData[movieName][i],0,0);
-// 			//var workingImage = new Image();
-// 			//workingImage.src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
-// 			//this.frames[i] = workingImage;
-// 			if (this.movieFrames[movieName][i] == null) {
-// 				this.movieFrames[movieName][i] = new Image();
-// 			}
-// 			this.movieFrames[movieName][i].src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
-// 		}
-// 	}
-// }
-
 // Public function
 // Input parameters: the new size for the shattered blocks (integer)
 // Returns: nothing
@@ -200,56 +140,19 @@ CinemaBlock.prototype.shatter = function(newBlockSize) {
 	PARAMS.initializeValidation();
 	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
 
-	if (!this.shattered) {
-		var blockClusterPositions = new Array();
-		var maxWidth = 0;
-		var maxHeight = 0;
+	var maxWidth = 0;
+	var maxHeight = 0;
 
-		for (var movieName in this.movieFrameAliases) {
-			for (var k = 0; k < this.movieFrameAliases[movieName].length; k++) {
-				var frame = this.getFrame(movieName,k);
+	for (var movieName in this.movieFrameAliases) {
+		for (var k = 0; k < this.movieFrameAliases[movieName].length; k++) {
+			var frame = this.getFrame(movieName,k);
 
-				if (frame.width > maxWidth) { maxWidth = frame.width; }
-				if (frame.height > maxHeight) { maxHeight = frame.height; }
-			}
-		}
-
-		var blockIndex = 0;
-		for (var i = 0; i < maxWidth; i += newBlockSize) {
-			for (var j = 0; j < maxHeight; j += newBlockSize) {
-				if (blockClusterPositions[blockIndex] == undefined) {
-					blockClusterPositions[blockIndex] = {"x":Math.floor(i - maxWidth/2 + newBlockSize/2), "y":Math.floor(j - maxHeight/2 + newBlockSize/2)};
-				}
-				
-				blockIndex++;
-			}
-		}
-
-		for (var i = 0; i < blockClusterPositions.length; i++) {
-			var newBlock = new FragmentBlock(this, newBlockSize, newBlockSize, blockClusterPositions[i].x, blockClusterPositions[i].y, 0);
-			
-			newBlock.setMemoryCapacity(this.memoryCapacity);
-			
-			this.adoptChild(newBlock);
-		}
-
-		this.shattered = true;
-	}
-}
-
-// Public function
-// Input parameters: none
-// Returns: nothing
-// Description: removes child blocks resulting from shatter
-CinemaBlock.prototype.unshatter = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i] instanceof FragmentBlock) {
-			this.children[i].destroy();
-			this.children.splice(i,1);
-			i--;
+			if (frame.width > maxWidth) { maxWidth = frame.width; }
+			if (frame.height > maxHeight) { maxHeight = frame.height; }
 		}
 	}
-	this.shattered = false;
+
+	ShatterTraits.prototype.shatter.call(this,newBlockSize,maxWidth,maxHeight);
 }
 
 // Public function
@@ -333,11 +236,7 @@ CinemaBlock.prototype.undraw = function(dest) {
 		
 		try {
 			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) > 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+				var zratio = this.getZRatio();
 
 				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -347,12 +246,6 @@ CinemaBlock.prototype.undraw = function(dest) {
 				dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
 				dest.rotate(this._getRotation()*Math.PI/180);
 
-				//dest.clearRect(-this.width/2 - 1, -this.height/2 - 1, this.width + 2, this.height + 2);
-
-				// if (this.parent.shattered && this.homeX != undefined && this.homeY != undefined) {
-				// 	dest.clearRect(-this.width/2 - 1,-this.height/2 - 1,this.width + 2,this.height + 2);
-				// }
-				// else 
 				if (!this._getShattered()) {
 					dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
 				}
@@ -379,26 +272,6 @@ CinemaBlock.prototype.undraw = function(dest) {
 // Description: overrides ActorBlock.update,
 // handles frame updates and filter/mask application
 CinemaBlock.prototype.update = function() {
-	// if (this.isPlaying) {
-	// 	this.currentFrameIndex++;
-
-	// 	if ((this.movieFrameAliases[this.currentMovie] != null && this.movieFrameAliases[this.currentMovie].length > 0 && this.currentFrameIndex >= this.movieFrameAliases[this.currentMovie].length) ||
-	// 		 (this.movieFrameData[this.currentMovie] != null && this.movieFrameData[this.currentMovie].length > 0 && this.currentFrameIndex >= this.movieFrameData[this.currentMovie].length)) {
-	// 		 this.currentFrameIndex = 0;
-	// 	}
-	// }
-
-	// if (this.currentFrameIndex < 0) {
-	// 	this.currentFrameIndex = 0;
-	// }
-
-	// var currentFrame = this.getCurrentFrame();
-
-	// if (currentFrame != null) {
-	// 	this.width = currentFrame.width;
-	// 	this.height = currentFrame.height;
-	// }
-
 	ActorBlock.prototype.update.call(this);
 
 	if (this.isPlaying) {
@@ -426,14 +299,6 @@ CinemaBlock.prototype.update = function() {
 
 	this._setShattered(this.shattered);
 
-	// was this after the superclass update for a reason?
-	// var currentFrame = this.getCurrentFrame();
-
-	// if (currentFrame != null) {
-	// 	this.width = currentFrame.width;
-	// 	this.height = currentFrame.height;
-	// }
-
 	this.applyFiltersAndMasks();
 }
 
@@ -452,11 +317,7 @@ CinemaBlock.prototype.draw = function(dest) {
 		
 		try {
 			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) > 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+				var zratio = this.getZRatio();
 
 				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -476,19 +337,6 @@ CinemaBlock.prototype.draw = function(dest) {
 					break;
 				}
 				
-				// var currentFrame = this.getCurrentFrame();
-				// if (currentFrame != null) {	
-				// 	dest.drawImage(currentFrame,-this.width/2,-this.height/2);
-				// }
-
-				// if (this.parent.shattered && this.homeX != undefined && this.homeY != undefined) {
-				// 	var currentFrame = this.parent.getCurrentFrame();
-				// 	if (currentFrame != null) {
-				// 		dest.drawImage(currentFrame,this.homeX+this.parent.width/2-this.width/2,this.homeY+this.parent.height/2-this.height/2,this.width,this.height,
-				// 									-this.width/2,-this.height/2,this.width,this.height);
-				// 	}
-				// }
-				// else 
 				if (!this._getShattered()) {
 					var currentFrame = this.getCurrentFrame();
 					if (currentFrame != null) {	
@@ -1199,7 +1047,6 @@ CinemaBlock.prototype.destroy = function() {
 
 	this.movieFiltersUpdate = undefined;
 	this.movieMasksUpdate = undefined;
-
 
 	this.isPlaying = undefined;
 	this.currentMovie = undefined;

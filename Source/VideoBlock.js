@@ -9,7 +9,7 @@ var VideoBlock = function(videoAlias, width, height) {
 	height = PARAMS.validateParam(PARAMS.UNSIGNEDINTEGER, height);
 
 	LOG.write("VideoBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	var video = null;
 
@@ -23,16 +23,11 @@ var VideoBlock = function(videoAlias, width, height) {
 	this.height = height;
 
 	this.currentTime = this.video ? 0 : this.video.getCurrentTime();
-
-	var shattered = false;
-
-	this._getShattered = function() { return shattered; };
-	this._setShattered = function(val) { shattered = val };
-
-	this.shattered = shattered;
 }
 
-VideoBlock.prototype = new PlayerBlock();
+VideoBlock.prototype = new ActorBlock();
+VideoBlock.prototype.learn(PlayerTraits);
+VideoBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -205,17 +200,6 @@ VideoBlock.prototype.shatter = function(newBlockSize) {
 			var newBlock = new FragmentBlock(this, newBlockSize, newBlockSize, blockClusterPositions[i].x, blockClusterPositions[i].y, 0);
 
 			newBlock.setMemoryCapacity(this.memoryCapacity);
-
-			// newBlock.x = blockClusterPositions[i].x;
-			// newBlock.y = blockClusterPositions[i].y;
-			// newBlock.z = 0;
-
-			// newBlock.homeX = blockClusterPositions[i].x;
-			// newBlock.homeY = blockClusterPositions[i].y;
-			// newBlock.homeZ = 0;
-
-			// newBlock.width = newBlockSize;
-			// newBlock.height = newBlockSize;
 			
 			this.adoptChild(newBlock);
 		}
@@ -274,11 +258,7 @@ VideoBlock.prototype.undraw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2)
-			var zratio = 1
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -288,12 +268,6 @@ VideoBlock.prototype.undraw = function(dest) {
 			dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
 			dest.rotate(this._getRotation()*Math.PI/180);
 
-			//dest.clearRect(-this.width/2 - 1, -this.height/2 - 1, this.width + 2, this.height + 2);
-
-			// if (this.parent.shattered && this.homeX != undefined && this.homeY != undefined) {
-			// 	dest.clearRect(-this.width/2 - 1,-this.height/2 - 1,this.width + 2,this.height + 2);
-			// }
-			// else 
 			if (!this._getShattered() && this._getVideo()) {
 				dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
 			}
@@ -338,11 +312,7 @@ VideoBlock.prototype.draw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -362,27 +332,6 @@ VideoBlock.prototype.draw = function(dest) {
 			// 	break;
 			// }
 			
-			// var currentFrame = this.getCurrentFrame();
-			// if (currentFrame != null) {	
-			// 	dest.drawImage(currentFrame,-this.width/2,-this.height/2);
-			// }
-
-			//dest.drawImage(this.video.video,-this.width/2,-this.height/2,this.width,this.height);
-
-			// if (this.parent.shattered && this.homeX != undefined && this.homeY != undefined) {
-			// 	var xratio = this.parent.width / this.parent.video.video.videoWidth;
-			// 	var yratio = this.parent.height / this.parent.video.video.videoHeight;
-			// 	dest.drawImage(this.parent.video.video,
-			// 					(this.homeX+this.parent.width/2-this.width/2)/xratio,
-			// 					(this.homeY+this.parent.height/2-this.height/2)/yratio,
-			// 					this.width/xratio,
-			// 					this.height/yratio,
-			// 					-this.width/2,
-			// 					-this.height/2,
-			// 					this.width,
-			// 					this.height);
-			// }
-			// else 
 			if (!this._getShattered() && this._getVideo()) {
 				dest.drawImage(this._getVideo().video,-this._getWidth()/2,-this._getHeight()/2,this._getWidth(),this._getHeight());
 			}

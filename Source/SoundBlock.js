@@ -7,12 +7,13 @@ var SoundBlock = function(trackAlias) {
 	trackAlias = PARAMS.validateParam(PARAMS.STRING, trackAlias);
 
 	LOG.write("SoundBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	this.track = CANVASMANAGER.getAudioAsset(trackAlias);
 }
 
-SoundBlock.prototype = new PlayerBlock();
+SoundBlock.prototype = new ActorBlock();
+SoundBlock.prototype.learn(PlayerTraits);
 
 // Public function
 // Input parameter(s): none

@@ -1,3 +1,7 @@
+
+/************************************************************
+  Log utilities
+************************************************************/
 var Log = function() {
 	this.logThreshold = 0;
 	this.displayObjects = false;
@@ -165,6 +169,10 @@ Log.prototype.writeBlock = function(block, logType, identity) {
 
 var LOG = new Log();
 
+
+/***********************************************************
+  KeyCodes Enums and Utilities
+***********************************************************/
 var KeyCodes = function() {
 	this.A = 65;
 	this.B = 66;
@@ -350,7 +358,13 @@ KeyCodes.prototype.isKeyCodeArrow = function(keycode) {
 
 var KEYCODES = new KeyCodes();
 
-var getFunctionName = function(functionObject) {
+
+/***************************************************************
+  Common Utilities
+***************************************************************/
+var Common = function() { } 
+
+Common.prototype.getFunctionName = function(functionObject) {
 	var functionString = String(functionObject);
 	var firstIndex = functionString.indexOf(' ') + 1;
 	var lastIndex = functionString.indexOf('(');
@@ -358,46 +372,33 @@ var getFunctionName = function(functionObject) {
 	return functionString.substring(firstIndex, lastIndex);
 }
 
-// gets the class name and function name of the caller of the function that called this function
-// e.g. MovieBlock.addColorFilter
-var getCallerClassNameFunctionName = function() {
-	var e = new Error("");
-	if (e.stack == null) {
-		return " . "
-	}
-	else if (e.stack.indexOf("    at ") >= 0) {
-		return e.stack.split("    at ")[3].split(" ")[0]; // this doesn't capture 'new BlockEvent', just 'new'
-	}
-	else if (e.stack.indexOf("@") >= 0) {
-		return e.stack.split(/\s/)[2].split("@")[0]; // this only captures 'BlockEvent', 'new' is not included
-	}
-	else {
-		return " . ";
-	}
-}
-
-// gets the function name of the caller of the function that called this function
-var getCallerFunctionName = function() {
-	return getCallerClassNameFunctionName().split(".")[1];
-}
-
-//var trace = function(string) {
-//	console.log(string);
-//}
-
-var copyArray = function(src, dest) {
+Common.prototype.copyArray = function(src, dest) {
 	for (var i = 0; i < src.length; i++) {
 		dest[i] = src[i];
 	}
 	return dest;
 }
 
-var extend = function(srcObj, destObj, recurseDown) {
+Common.prototype.extend = function(srcObj, destObj) {
 	for (var prop in srcObj) {
 		destObj[prop] = srcObj[prop];
 	}
 }
 
+Common.prototype.extendInternalProperties = function(srcObj, destObj) {
+	for (var prop in srcObj) {
+		if (prop.charAt(0) == "_" || !(srcObj[prop] instanceof Function || typeof srcObj[prop] == "function")) {
+			destObj[prop] = srcObj[prop];
+		}
+	}
+}
+
+var COMMON = new Common();
+
+
+/**************************************************************
+  Utilities to help with measuring and drawing text
+**************************************************************/
 var TextHelper = function() {
 	this.span = document.createElement("span");
 	this.block = document.createElement("div");
@@ -443,9 +444,12 @@ TextHelper.prototype.measureTextHeight = function(text, font, size) {
 
 }
 
-
 var TEXTHELPER = new TextHelper();
 
+
+/*****************************************************************
+  Matrix utilities
+*****************************************************************/
 var Matrix = function() {
 	this.transformations = new Array();
 	this.result = {x:0,y:0,z:0};
@@ -574,7 +578,10 @@ Matrix.prototype.debugApplyTransformation = function(x,y) {
 
 var MATRIX = new Matrix();
 
-// todo: add imgData type?
+
+/**************************************************************
+  Utilities to help with parameter validation
+**************************************************************/
 var Params = function() {
 	this.NONE = -1;
 	this.BOOLEAN = 0;
@@ -585,7 +592,7 @@ var Params = function() {
 	this.FUNCTION = 5;
 	this.OBJECT = 6;
 	this.CANVAS2DCONTEXT = 7;
-	//reserved for imagedata
+	this.TRAITS = 8;
 	this.MEMORY = 9;
 	this.MATRIX = 10;
 	this.EVENT = 11;
@@ -614,6 +621,7 @@ var Params = function() {
 	this.ARRAYOFFUNCTION = 55;
 	this.ARRAYOFOBJECT = 56;
 	this.ARRAYOFCANVAS2DCONTEXT = 57;
+	this.ARRAYOFTRAITS = 58;
 	this.ARRAYOFMEMORY = 59;
 	this.ARRAYOFMATRIX = 60;
 	this.ARRAYOFBLOCK = 61;
@@ -641,6 +649,7 @@ var Params = function() {
 	this.typeNames[this.OBJECT] = "Object";
 	this.typeNames[this.CANVAS2DCONTEXT] = "Canvas2DContext";
 
+	this.typeNames[this.TRAITS] = "Traits";
 	this.typeNames[this.MEMORY] = "Memory";
 	this.typeNames[this.MATRIX] = "Matrix";
 	this.typeNames[this.EVENT] = "Event";
@@ -669,6 +678,7 @@ var Params = function() {
 	this.typeNames[this.ARRAYOFFUNCTION] = "Array of Functions";
 	this.typeNames[this.ARRAYOFOBJECT] = "Array of Objects";
 	this.typeNames[this.ARRAYOFCANVAS2DCONTEXT] = "Array of Canvas2DContexts";
+	this.typeNames[this.ARRAYOFTRAITS] = "Array of Traits";
 	this.typeNames[this.ARRAYOFMEMORY] = "Array of Memorys";
 	this.typeNames[this.ARRAYOFMATRIX] = "Array of Matrixs";
 	this.typeNames[this.ARRAYOFBLOCK] = "Array of Blocks";
@@ -694,7 +704,7 @@ var Params = function() {
 	this.typeDefaults[this.FUNCTION] = null;
 	this.typeDefaults[this.OBJECT] = null;
 	this.typeDefaults[this.CANVAS2DCONTEXT] = null;
-
+	this.typeDefaults[this.TRAITS] = null;
 	this.typeDefaults[this.MEMORY] = null;
 	this.typeDefaults[this.MATRIX] = null;
 	this.typeDefaults[this.EVENT] = null;
@@ -722,6 +732,7 @@ var Params = function() {
 	this.typeDefaults[this.ARRAYOFFUNCTION] = null;
 	this.typeDefaults[this.ARRAYOFOBJECT] = null;
 	this.typeDefaults[this.ARRAYOFCANVAS2DCONTEXT] = null;
+	this.typeDefaults[this.ARRAYOFTRAITS] = null;
 	this.typeDefaults[this.ARRAYOFMEMORY] = null;
 	this.typeDefaults[this.ARRAYOFMATRIX] = null;
 
@@ -748,7 +759,7 @@ var Params = function() {
 	this.associatedTypes[this.ARRAYOFFUNCTION] = this.FUNCTION;
 	this.associatedTypes[this.ARRAYOFOBJECT] = this.OBJECT;
 	this.associatedTypes[this.ARRAYOFCANVAS2DCONTEXT] = this.CANVAS2DCONTEXT;
-
+	this.associatedTypes[this.ARRAYOFTRAITS] = this.TRAITS;
 	this.associatedTypes[this.ARRAYOFMEMORY] = this.MEMORY;
 	this.associatedTypes[this.ARRAYOFMATRIX] = this.MATRIX;
 	this.associatedTypes[this.ARRAYOFBLOCK] = this.BLOCK;
@@ -767,6 +778,29 @@ var Params = function() {
 	this.currentFunctionName = "";
 	this.currentParamIndex = 0;
 
+}
+
+// gets the class name and function name of the caller of the function that called this function
+// e.g. MovieBlock.addColorFilter
+Params.prototype.getCallerClassNameFunctionName = function() {
+	var e = new Error("");
+	if (e.stack == null) {
+		return " . "
+	}
+	else if (e.stack.indexOf("    at ") >= 0) {
+		return e.stack.split("    at ")[3].split(" ")[0]; // this doesn't capture 'new BlockEvent', just 'new'
+	}
+	else if (e.stack.indexOf("@") >= 0) {
+		return e.stack.split(/\s/)[2].split("@")[0]; // this only captures 'BlockEvent', 'new' is not included
+	}
+	else {
+		return " . ";
+	}
+}
+
+// gets the function name of the caller of the function that called this function
+Params.prototype.getCallerFunctionName = function() {
+	return getCallerClassNameFunctionName().split(".")[1];
 }
 
 Params.prototype.getDefaultOrNullValue = function(defaultValue) {
@@ -797,7 +831,7 @@ Params.prototype.createArrayParamHeaderValidationMessage = function() {
 
 Params.prototype.initializeValidation = function(customFunctionName) {
 	if (customFunctionName == undefined) {
-		this.currentFunctionName = LOG.logThreshold <= LOG.WARN ? getCallerClassNameFunctionName() : "";
+		this.currentFunctionName = LOG.logThreshold <= LOG.WARN ? this.getCallerClassNameFunctionName() : "";
 	}
 	else {
 		this.currentFunctionName = customFunctionName;
@@ -848,6 +882,10 @@ Params.prototype.isTypeOf = function(value, typeEnum) {
 
 		case this.CANVAS2DCONTEXT:
 			return value instanceof CanvasRenderingContext2D;
+			break;
+
+		case this.TRAITS:
+			return value.prototype instanceof Traits;
 			break;
 
 		case this.MEMORY:
@@ -994,6 +1032,7 @@ Params.prototype.validateParam = function(typeEnum, value, defaultValue) {
 		case this.OBJECT:
 		case this.CANVAS2DCONTEXT:
 		case this.MEMORY:
+		case this.TRAITS:
 		case this.MATRIX:
 		case this.EVENT:
 		case this.BLOCKEVENT:
@@ -1057,6 +1096,7 @@ Params.prototype.validateParam = function(typeEnum, value, defaultValue) {
 		case this.ARRAYOFOBJECT:
 		case this.ARRAYOFCANVAS2DCONTEXT:
 		case this.ARRAYOFMEMORY:
+		case this.ARRAYOFTRAITS:
 		case this.ARRAYOFMATRIX:
 		case this.ARRAYOFBLOCK:
 		case this.ARRAYOFACTORBLOCK:
@@ -1196,7 +1236,7 @@ Params.prototype.validateParam = function(typeEnum, value, defaultValue) {
 Params.prototype.validateArguments = function(typeList,argumentsList,defaultList) {
 	defaultList = typeof defaultList !== "undefined" ? defaultList : [];
 
-	var functionName = LOG.logThreshold <= LOG.WARN ? getCallerClassNameFunctionName() : "";
+	var functionName = LOG.logThreshold <= LOG.WARN ? this.getCallerClassNameFunctionName() : "";
 	var restPatternStartIndex = 0;
 	var typeIndex = 0;
 	var defaultIndex = 0;
@@ -1238,458 +1278,6 @@ Params.prototype.validateVariableObject = function(variableObject,variableNamesL
 
 var PARAMS = new Params();
 
-
-var parseCanvasCommands = function(dest,commands) {
-	PARAMS.initializeValidation();
-	dest = PARAMS.validateParam(PARAMS.CANVAS2DCONTEXT,dest);
-	commands = PARAMS.validateParam(PARAMS.ARRAYOFOBJECT,commands);
-
-	var saveCount = 0;
-	var restoreCount = 0;
-
-	for (var i = 0; i < commands.length; i++) {
-		var command = commands[i].command;
-		var parameters = commands[i].parameters;
-		switch(command) {
-			case "arc":
-				if (parameters.length == 5) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.arc(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4]);
-				}
-				else if (parameters.length == 6) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.BOOLEAN],
-											 parameters);
-					dest.arc(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5]);
-				}
-				break;
-
-			case "arcTo":
-				if (parameters.length == 5) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.arcTo(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4]);
-				}
-				break;
-
-			case "beginPath":
-				dest.beginPath();
-				break;
-
-			case "bezierCurveTo":
-				if (parameters.length == 6) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.bezierCurveTo(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5]);
-				}
-				break;
-
-			// should we allow this one?
-			case "clearRect":
-				if (parameters.length == 4) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.clearRect(parameters[0] - 1,parameters[1] - 1,parameters[2] + 2,parameters[3] + 2);
-				}
-				break;
-
-			case "clip":
-				dest.clip();
-				break;
-
-			case "closePath":
-				dest.closePath();
-				break;
-
-			case "createImageData":
-				// not implemented, since it returns image data
-				break;
-
-			case "createLinearGradient":
-				// not implemented, since it returns a gradient object
-				break;
-
-			case "createPattern":
-				// not implemented, since it returns a pattern object
-				break;
-
-			case "createRadialGradient":
-				// not implemented, since it returns a gradient object
-				break;
-
-			case "drawCustomFocusRing":
-				// not implemented, since I don't know what this function does or what it needs
-				break;
-
-			case "drawImage":
-				if (parameters.length == 3) {
-					PARAMS.initializeValidation(command);
-					// first parameter should be nsIDOMElement (image)
-					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.drawImage(parameters[0],parameters[1],parameters[2]);
-				}
-				else if (parameters.length == 5) {
-					PARAMS.initializeValidation(command);
-					// first parameter should be nsIDOMElement (image)
-					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.drawImage(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4]);
-				}
-				else if (parameters.length == 9) {
-					PARAMS.initializeValidation(command);
-					// first parameter should be nsIDOMElement (image)
-					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.drawImage(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5],parameters[6],parameters[7],parameters[8]);
-				}
-				break;
-
-			case "drawSystemFocusRing":
-				// not implemented, since I don't know what this function does or what it needs
-				break;
-
-			case "fill":
-				dest.fill();
-				break;
-
-			case "fillRect":
-				if (parameters.length == 4) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.fillRect(parameters[0],parameters[1],parameters[2],parameters[3]);
-				}
-				break;
-
-			case "fillText":
-				if (parameters.length == 3) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.fillText(parameters[0],parameters[1],parameters[2]);
-				}
-				else if (parameters.length == 4) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.fillText(parameters[0],parameters[1],parameters[2],parameters[3]);
-				}
-				break;
-
-			case "getImageData":
-				// not implemented, since it returns image data
-				break;
-
-			case "getLineDash":
-				// not implemented, since I don't know what this function does or what it needs
-				break;
-
-			case "isPointInPath":
-				// not implemented, since it returns a boolean
-				break;
-
-			case "isPointInStroke":
-				// not implemented, since it returns a boolean
-				break;
-
-			case "lineTo":
-				if (parameters.length == 2) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.lineTo(parameters[0],parameters[1]);
-				}
-				break;
-
-			case "measureText":
-				// not implemented, since it returns a nsIDOMTextMetrics object
-				break;
-
-			case "moveTo":
-				if (parameters.length == 2) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.moveTo(parameters[0],parameters[1]);
-				}
-				break;
-
-			case "putImageData":
-				if (parameters.length == 3) {
-					PARAMS.initializeValidation(command);
-					// first parameter should be imageData
-					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.putImageData(parameters[0],parameters[1],parameters[2]);
-				}
-				else if (parameters.length == 7) {
-					PARAMS.initializeValidation(command);
-					// first parameter should be imageData
-					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.INTEGER,PARAMS.INTEGER,PARAMS.INTEGER,PARAMS.INTEGER],
-											 parameters);
-					dest.putImageData(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5],parameters[6]);
-				}
-				break;
-
-			case "quadraticCurveTo":
-				if (parameters.length == 4) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.putImageData(parameters[0],parameters[1],parameters[2],parameters[3]);
-				}
-				break;
-
-			case "rect":
-				if (parameters.length == 4) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.rect(parameters[0],parameters[1],parameters[2],parameters[3]);
-				}
-				break;
-
-			case "restore":
-				if (restoreCount < saveCount) {
-					dest.restore();
-					restoreCount++;
-				}
-				break;
-
-			case "rotate":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER],
-											 parameters);
-					dest.rotate(parameters[0]);
-				}
-				break;
-
-			case "save":
-				dest.save();
-				saveCount++;
-				break;
-
-			case "scale":
-				if (parameters.length == 2) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.scale(parameters[0],parameters[1]);
-				}
-				break;
-
-			case "scrollPathIntoView":
-				// not implemented, since I don't know what this function does or what it needs
-				break;
-
-			// the following cases are for setting properties, rather than calling functions ******************
-			case "setFillStyle":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING],
-											 parameters);
-					dest.fillStyle = parameters[0];
-				}
-				break;
-
-			case "setFont":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING],
-											 parameters);
-					dest.font = parameters[0];
-				}
-				break;
-
-			case "setGlobalAlpha":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER],
-											 parameters);
-					dest.globalAlpha = parameters[0];
-				}
-				break;
-
-			case "setGlobalCompositeOperation":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING],
-											 parameters);
-					dest.globalCompositeOperation = parameters[0];
-				}
-				break;
-
-			case "setLineCap":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING],
-											 parameters);
-					dest.lineCap = parameters[0];
-				}
-				break;
-
-			case "setLineDashOffset":
-				// not implemented, since I don't know how to use this property
-				break;
-
-			case "setLineJoin":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING],
-											 parameters);
-					dest.lineJoin = parameters[0];
-				}
-				break;
-
-			case "setLineWidth":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER],
-											 parameters);
-					dest.lineWidth = parameters[0];
-				}
-				break;
-
-			case "setMiterLimit":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER],
-											 parameters);
-					dest.miterLimit = parameters[0];
-				}
-				break;
-
-			case "setShadowBlur":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER],
-											 parameters);
-					dest.shadowBlur = parameters[0];
-				}
-				break;
-
-			case "setShadowOffsetX":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER],
-											 parameters);
-					dest.shadowOffsetX = parameters[0];
-				}
-				break;
-
-			case "setShadowOffsetY":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER],
-											 parameters);
-					dest.shadowOffsetY = parameters[0];
-				}
-				break;
-
-			case "setStrokeStyle":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING],
-											 parameters);
-					dest.strokeStyle = parameters[0];
-				}
-				break;
-
-			case "setTextAlign":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING],
-											 parameters);
-					dest.textAlign = parameters[0];
-				}
-				break;
-
-			case "setTextBaseline":
-				if (parameters.length == 1) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING],
-											 parameters);
-					dest.textBaseline = parameters[0];
-				}
-				break;
-
-			// this ends the properties cases of this function *************************************
-
-			case "setLineDash":
-				// not implemented, since I don't know what this function does or what it needs
-				break;
-
-			case "setTransform":
-				if (parameters.length == 6) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.setTransform(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5]);
-				}
-				break;
-
-			case "stroke":
-				dest.stroke();
-				break;
-
-			case "strokeRect":
-				if (parameters.length == 4) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.strokeRect(parameters[0],parameters[1],parameters[2],parameters[3]);
-				}
-				break;
-
-			case "strokeText":
-				if (parameters.length == 3) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.strokeText(parameters[0],parameters[1],parameters[2]);
-				}
-				else if (parameters.length == 4) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.STRING,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.strokeText(parameters[0],parameters[1],parameters[2],parameters[3]);
-				}
-				break;
-
-			case "transform":
-				if (parameters.length == 6) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.transform(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5]);
-				}
-				break;
-
-			case "translate":
-				if (parameters.length == 2) {
-					PARAMS.initializeValidation(command);
-					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER],
-											 parameters);
-					dest.translate(parameters[0],parameters[1]);
-				}
-				break;
-
-		}
-	}
-
-	if (saveCount > restoreCount) {
-		for (var i = 0; i < saveCount - restoreCount; i++) {
-			dest.restore();
-		}
-	}
-}
 // Public Constructor function
 // Input parameter(s):  none
 // Returns: AudioTrack object
@@ -1979,9 +1567,8 @@ Video.prototype.destroy = function() {
 	this.onload = undefined;
 	this.onloadEventListenerAdded = undefined;
 }
-var Memory = function() {
-	
-}
+var Memory = function() { }
+var Traits = function() { }
 var Event = function() {
 	this.subscribedFunctions = new Array();
 }
@@ -2733,7 +2320,24 @@ var Block = function () {
 	this.initialized = false;
 
 	this.isMarkedForDestruction = false;
+
+	if (this.traits) {
+		for (var i = 0; i < this.traits.length; i++) {
+			COMMON.extendInternalProperties(new this.traits[i](), this);
+		}
+	}
 };
+
+Block.prototype.learn = function(traits) {
+	PARAMS.initializeValidation();
+	traits = PARAMS.validateParam(PARAMS.TRAITS, traits);
+
+	COMMON.extend(new traits(), this);
+	if (!this.traits) {
+		this.traits = [];
+	}
+	this.traits.push(traits);
+}
 
 Block.prototype.globalX = function() {
 	if (this.parent == null) {
@@ -2811,13 +2415,18 @@ Block.prototype.toggleDebugDisplay = function(propagateToChildren) {
 	}
 }
 
+Block.prototype.getZRatio = function() {
+	var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2)
+	var zratio = 1
+	if ((this._getZ() + zscale) != 0) {
+		zratio = 1 / ((this._getZ() + zscale) / zscale);
+	} 
+	return zratio;
+}
+
 Block.prototype.undraw = function(dest) {
 	if (this._getVisible()) {
-		var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2)
-		var zratio = 1
-		if ((this._getZ() + zscale) != 0) {
-			zratio = 1 / ((this._getZ() + zscale) / zscale);
-		} 
+		var zratio = this.getZRatio();
 
 		drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 		drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -2859,11 +2468,7 @@ Block.prototype.update = function() {
 
 Block.prototype.draw = function(dest) {
 	if (this._getVisible()) {
-		var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-		var zratio = 1;
-		if ((this._getZ() + zscale) != 0) {
-			zratio = 1 / ((this._getZ() + zscale) / zscale);
-		} 
+		var zratio = this.getZRatio();
 
 		drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 		drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -3410,48 +3015,50 @@ ActorBlock.prototype.update = function() {
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: add a behavior to an object, with optional variables associated with it
-// Example: myblockCluster.addBehavior(animate, {framesPerImage:2, frameRate:30}, false);
-ActorBlock.prototype.addBehavior = function (behavior, vars, propagateToChildren) {
+// Example: myblockCluster.addBehavior(animate, {framesPerImage:2, frameRate:30});
+ActorBlock.prototype.addBehavior = function (behavior, vars) {
 	PARAMS.initializeValidation();
 	behavior = PARAMS.validateParam(PARAMS.FUNCTION, behavior);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addBehavior(behavior, extend(vars, {}));
-			}
-			else {
-				this.children[i].addBehavior(behavior, extend(vars, {}), true);
-			}
+	var behaviorName = behavior.behaviorName;
+	if (!behaviorName) {
+		behaviorName = COMMON.getFunctionName(behavior);
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.behaviors.length; i++) {
+		if (behaviorName == this.behaviors[i].behaviorName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var behaviorName = behavior.behaviorName;
-		if (!behaviorName) {
-			behaviorName = getFunctionName(behavior);
-		}
 
-		var index = -1;
-		for (var i = 0; i < this.behaviors.length; i++) {
-			if (behaviorName == this.behaviors[i].behaviorName) {
-				index = i;
-				break;
-			}
+	if (index == -1) {
+		var boundBehavior = behavior.bind(vars);
+		boundBehavior.behaviorName = behaviorName;
+		this.behaviors.push(boundBehavior);
+		if (vars != undefined) {
+			this.behaviorVars[behaviorName] = vars;
 		}
-		//if (this.behaviorLock == undefined && this.behaviors.indexOf(behavior) == -1) {
-		if (index == -1) {
-			var boundBehavior = behavior.bind(vars);
-			boundBehavior.behaviorName = behaviorName;
-			this.behaviors.push(boundBehavior);
-			if (vars != undefined) {
-				this.behaviorVars[behaviorName] = vars;
-			}
-		}
+	}
+}
+
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: add a behavior to an object's children, with optional variables associated with it
+// Example: myblockCluster.addBehaviorToChildren(animate, {framesPerImage:2, frameRate:30});
+ActorBlock.prototype.addBehaviorToChildren = function (behavior, vars) {
+	PARAMS.initializeValidation();
+	behavior = PARAMS.validateParam(PARAMS.FUNCTION, behavior);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addBehavior(behavior, COMMON.extend(vars, {}));
 	}
 }
 
@@ -3464,11 +3071,9 @@ ActorBlock.prototype.removeBehavior = function (behavior) {
 	PARAMS.initializeValidation();
 	behavior = PARAMS.validateParam(PARAMS.FUNCTION, behavior);
 
-	//var index = this.behaviors.indexOf(behavior);
-
 	var behaviorName = behavior.behaviorName;
 	if (!behaviorName) {
-		behaviorName = getFunctionName(behavior);
+		behaviorName = COMMON.getFunctionName(behavior);
 	}
 
 	var index = -1;
@@ -3486,7 +3091,14 @@ ActorBlock.prototype.removeBehavior = function (behavior) {
 		}
 		delete this.behaviorVars[behaviorName];
 	}
+}
 
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes a behavior from an object's children, including behavior variables
+// Example: myblockCluster.removeBehaviorFromChildren(animate);
+ActorBlock.prototype.removeBehaviorFromChildren = function(behavior) {
 	for (var i = 0; i < this.children.length; i++) {
 		this.children[i].removeBehavior(behavior);
 	}
@@ -3498,52 +3110,67 @@ ActorBlock.prototype.removeBehavior = function (behavior) {
 // Description: removes all behaviors from an object, including behavior variables
 // Example: myblockCluster.removeAllBehaviors();
 ActorBlock.prototype.removeAllBehaviors = function() {
-	// for (var behavior in this.behaviors) {
-	// 	this.removeBehavior(behavior);
-	// }
 	while (this.behaviors.length > 0) {
 		this.removeBehavior(this.behaviors[0]);
 	}
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function
+// Returns: nothing
+// Description: removes all behaviors from an object's children, including behavior variables
+// Example: myblockCluster.removeAllBehaviorsFromChildren();
+ActorBlock.prototype.removeAllBehaviorsFromChildren = function() {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllBehaviors();
+	}
+}
+
+// Public function
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: add a constraint to an object, with optional variables associated with it
-// Example: myblockCluster.addConstraint(checkForCrossedBoundaries, {leftMostX:200, topMostY:200}, false);
-ActorBlock.prototype.addConstraint = function (constraint, vars, propagateToChildren) {
+// Example: myblockCluster.addConstraint(checkForCrossedBoundaries, {leftMostX:200, topMostY:200});
+ActorBlock.prototype.addConstraint = function (constraint, vars) {
 	PARAMS.initializeValidation();
 	constraint = PARAMS.validateParam(PARAMS.FUNCTION, constraint);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].addConstraint(constraint, extend(vars,{}));
+	var constraintName = constraint.constraintName;
+	if (!constraintName) {
+		constraintName = COMMON.getFunctionName(constraint);
+	}
+	
+	var index = -1;
+	for (var i = 0; i < this.constraints.length; i++) {
+		if (constraintName == this.constraints[i].constraintName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var constraintName = constraint.constraintName;
-		if (!constraintName) {
-			constraintName = getFunctionName(constraint);
-		}
-		
-		var index = -1;
-		for (var i = 0; i < this.constraints.length; i++) {
-			if (constraintName == this.constraints[i].constraintName) {
-				index = i;
-				break;
-			}
-		}
 
-		if (index == -1) {
-			var boundConstraint = constraint.bind(vars);
-			boundConstraint.constraintName = constraintName;
-			this.constraints.push(boundConstraint);
-			if (vars != undefined) {
-				this.constraintVars[constraintName] = vars;
-			}
+	if (index == -1) {
+		var boundConstraint = constraint.bind(vars);
+		boundConstraint.constraintName = constraintName;
+		this.constraints.push(boundConstraint);
+		if (vars != undefined) {
+			this.constraintVars[constraintName] = vars;
 		}
+	}
+}
+
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: add a constraint to an object's children, with optional variables associated with it
+// Example: myblockCluster.addConstraintToChildren(checkForCrossedBoundaries, {leftMostX:200, topMostY:200});
+ActorBlock.prototype.addConstraintToChildren = function (constraint, vars) {
+	PARAMS.initializeValidation();
+	constraint = PARAMS.validateParam(PARAMS.FUNCTION, constraint);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addConstraint(constraint, COMMON.extend(vars,{}));
 	}
 }
 
@@ -3558,10 +3185,8 @@ ActorBlock.prototype.removeConstraint = function (constraint) {
 
 	var constraintName = constraint.constraintName;
 	if (!constraintName) {
-		constraintName = getFunctionName(constraint);
+		constraintName = COMMON.getFunctionName(constraint);
 	}
-
-	//var index = this.constraints.indexOf(constraint);
 
 	var index = -1;
 	for (var i = 0; i < this.constraints.length; i++) {
@@ -3578,6 +3203,16 @@ ActorBlock.prototype.removeConstraint = function (constraint) {
 		}
 		delete this.constraintVars[constraintName];
 	}
+}
+
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes a constraint from an object's children, including constraint variables
+// Example: myblockCluster.removeConstraintFromChildren(checkForCrossedBoundaries);
+ActorBlock.prototype.removeConstraintFromChildren = function (constraint) {
+	PARAMS.initializeValidation();
+	constraint = PARAMS.validateParam(PARAMS.FUNCTION, constraint);
 
 	for (var i = 0; i < this.children.length; i++) {
 		this.children[i].removeConstraint(constraint);
@@ -3590,12 +3225,19 @@ ActorBlock.prototype.removeConstraint = function (constraint) {
 // Description: removes all constraints from an object, including constraint variables
 // Example: myblockCluster.removeAllConstraints();
 ActorBlock.prototype.removeAllConstraints = function() {
-	// for (var constraint in this.constraints) {
-	// 	this.removeConstraint(constraint);
-	// }
-
 	while (this.constraints.length > 0) {
 		this.removeConstraint(this.constraints[0]);
+	}
+}
+
+// Public function
+// Input parameters: none
+// Returns: nothing
+// Description: removes all constraints from an object's children, including constraint variables
+// Example: myblockCluster.removeAllConstraintsFromChildren();
+ActorBlock.prototype.removeAllConstraintsFromChildren = function() {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllConstraintsFromChildren();
 	}
 }
 
@@ -3771,50 +3413,52 @@ ActorBlock.prototype.reactToMouseMoveEvent = function(mouseEvent) {
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to MouseMove events, 
 // and adds a mouseOver reaction to an object, with optional variables associated with it
-ActorBlock.prototype.addMouseOverReaction = function (reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addMouseOverReaction = function (reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	CANVASMANAGER.mouseMoveEvent.subscribe(this);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addMouseOverReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addMouseOverReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.mouseOverReactions.length; i++) {
+		if (reactionName == this.mouseOverReactions[i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		var index = -1;
-		for (var i = 0; i < this.mouseOverReactions.length; i++) {
-			if (reactionName == this.mouseOverReactions[i].reactionName) {
-				index = i;
-				break;
-			}
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.mouseOverReactions.push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.mouseOverReactions.push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to MouseMove events, 
+// and adds a mouseOver reaction to an object's children, with optional variables associated with it
+ActorBlock.prototype.addMouseOverReactionToChildren = function (reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addMouseOverReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -3829,10 +3473,8 @@ ActorBlock.prototype.removeMouseOverReaction = function (reaction) {
 
 	var reactionName = reaction.reactionName;
 	if (!reactionName) {
-		reactionName = getFunctionName(reaction);
+		reactionName = COMMON.getFunctionName(reaction);
 	}
-
-	//var index = this.mouseOverReactions.indexOf(reaction);
 
 	var index = -1;
 	for (var i = 0; i < this.mouseOverReactions.length; i++) {
@@ -3850,12 +3492,22 @@ ActorBlock.prototype.removeMouseOverReaction = function (reaction) {
 		delete this.behaviorVars[reactionName];
 	}
 
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].removeMouseOverReaction(reaction);
-	}
-
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
 		CANVASMANAGER.mouseMoveEvent.unsubscribe(this);
+	}
+}
+
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes a mouse over reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeMouseOverReactionFromChildren(hover);
+ActorBlock.prototype.removeMouseOverReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeMouseOverReaction(reaction);
 	}
 }
 
@@ -3865,60 +3517,69 @@ ActorBlock.prototype.removeMouseOverReaction = function (reaction) {
 // Description: removes all mouse over reactions from an object, including behavior variables
 // Example: myblockCluster.removeAllMouseOverReactions();
 ActorBlock.prototype.removeAllMouseOverReactions = function () {
-	// for (var reaction in this.mouseOverReactions) {
-	// 	this.removeMouseOverReaction(reaction);
-	// }
-
 	while (this.mouseOverReactions.length > 0) {
 		this.removeMouseOverReaction(this.mouseOverReactions[0]);
 	}
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function
+// Returns: nothing
+// Description: removes all mouse over reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllMouseOverReactionsFromChildren();
+ActorBlock.prototype.removeAllMouseOverReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllMouseOverReactions();
+	}
+}
+
+// Public function
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to MouseMove events, 
 // and adds a mouseOut reaction to an object, with optional variables associated with it
-ActorBlock.prototype.addMouseOutReaction = function (reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addMouseOutReaction = function (reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	CANVASMANAGER.mouseMoveEvent.subscribe(this);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addMouseOutReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addMouseOutReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.mouseOutReactions.length; i++) {
+		if (reactionName == this.mouseOutReactions[i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		var index = -1;
-		for (var i = 0; i < this.mouseOutReactions.length; i++) {
-			if (reactionName == this.mouseOutReactions[i].reactionName) {
-				index = i;
-				break;
-			}
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.mouseOutReactions.push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.mouseOutReactions.push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to MouseMove events, 
+// and adds a mouseOut reaction to an object's children, with optional variables associated with it
+ActorBlock.prototype.addMouseOutReactionToChildren = function (reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addMouseOutReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -3933,7 +3594,7 @@ ActorBlock.prototype.removeMouseOutReaction = function (reaction) {
 
 	var reactionName = reaction.reactionName;
 	if (!reactionName) {
-		reactionName = getFunctionName(reaction);
+		reactionName = COMMON.getFunctionName(reaction);
 	}
 
 	var index = -1;
@@ -3944,17 +3605,12 @@ ActorBlock.prototype.removeMouseOutReaction = function (reaction) {
 		}
 	}
 
-	//var index = this.mouseOutReactions.indexOf(reaction);
 	if (index > -1) {
 		this.mouseOutReactions.splice(index,1);
 		for (var innerProp in this.behaviorVars[reactionName]) {
 			delete this.behaviorVars[reactionName][innerProp];
 		}
 		delete this.behaviorVars[reactionName];
-	}
-
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].removeMouseOutReaction(reaction);
 	}
 
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
@@ -3965,63 +3621,86 @@ ActorBlock.prototype.removeMouseOutReaction = function (reaction) {
 // Public function
 // Input parameters: a function
 // Returns: nothing
-// Description: removes all mouse out reactions from an object, including behavior variables
+// Description: removes a mouse out reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeMouseOutReactionFromChildren(leftBlock);
+ActorBlock.prototype.removeMouseOutReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeMouseOutReaction(reaction);
+	}
+}
+
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes all mouse out reactions from an object's, including behavior variables
 // Example: myblockCluster.removeAllMouseOutReactions();
 ActorBlock.prototype.removeAllMouseOutReactions = function () {
-	// for (var reaction in this.mouseOutReactions) {
-	// 	this.removeMouseOutReaction(reaction);
-	// }
-
 	while (this.mouseOutReactions.length > 0) {
 		this.removeMouseOutReaction(this.mouseOutReactions[0]);
 	}
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function
+// Returns: nothing
+// Description: removes all mouse out reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllMouseOutReactionsFromChildren();
+ActorBlock.prototype.removeAllMouseOutReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllMouseOutReactions();
+	}
+}
+
+// Public function
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to MouseMove events, 
 // and adds a mouseMove reaction to an object, with optional variables associated with it
-ActorBlock.prototype.addMouseMoveReaction = function (reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addMouseMoveReaction = function (reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	CANVASMANAGER.mouseMoveEvent.subscribe(this);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addMouseMoveReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addMouseMoveReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.mouseMoveReactions.length; i++) {
+		if (reactionName == this.mouseMoveReactions[i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		var index = -1;
-		for (var i = 0; i < this.mouseMoveReactions.length; i++) {
-			if (reactionName == this.mouseMoveReactions[i].reactionName) {
-				index = i;
-				break;
-			}
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.mouseMoveReactions.push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = getFunctionName(reaction);
-			this.mouseMoveReactions.push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to MouseMove events, 
+// and adds a mouseMove reaction to an object's children, with optional variables associated with it
+ActorBlock.prototype.addMouseMoveReactionToChildren = function (reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addMouseMoveReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4036,7 +3715,7 @@ ActorBlock.prototype.removeMouseMoveReaction = function (reaction) {
 
 	var reactionName = reaction.reactionName;
 	if (!reactionName) {
-		reactionName = getFunctionName(reaction);
+		reactionName = COMMON.getFunctionName(reaction);
 	}
 
 	var index = -1;
@@ -4047,17 +3726,12 @@ ActorBlock.prototype.removeMouseMoveReaction = function (reaction) {
 		}
 	}
 
-	//var index = this.mouseMoveReactions.indexOf(reaction);
 	if (index > -1) {
 		this.mouseMoveReactions.splice(index,1);
 		for (var innerProp in this.behaviorVars[reactionName]) {
 			delete this.behaviorVars[reactionName][innerProp];
 		}
 		delete this.behaviorVars[reactionName];
-	}
-
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].removeMouseMoveReaction(reaction);
 	}
 
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
@@ -4068,15 +3742,36 @@ ActorBlock.prototype.removeMouseMoveReaction = function (reaction) {
 // Public function
 // Input parameters: a function
 // Returns: nothing
+// Description: removes a mouse over reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeMouseMoveReactionFromChildren(hover);
+ActorBlock.prototype.removeMouseMoveReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeMouseMoveReaction(reaction);
+	}
+}
+
+// Public function
+// Input parameters: none
+// Returns: nothing
 // Description: removes all mouse over reactions from an object, including behavior variables
 // Example: myblockCluster.removeAllMouseMoveReactions();
 ActorBlock.prototype.removeAllMouseOverReactions = function () {
-	// for (var reaction in this.mouseMoveReactions) {
-	// 	this.removeMouseOverReaction(reaction);
-	// }
-
 	while (this.mouseOverReactions.length > 0) {
 		this.removeMouseOverReaction(this.mouseOverReactions[0]);
+	}
+}
+
+// Public function
+// Input parameters: none
+// Returns: nothing
+// Description: removes all mouse over reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllMouseMoveReactionsFromChildren();
+ActorBlock.prototype.removeAllMouseOverReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllMouseMoveReactions();
 	}
 }
 
@@ -4098,50 +3793,52 @@ ActorBlock.prototype.reactToMouseClickEvent = function(mouseEvent) {
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to MouseClick events, 
 // and adds a mouseClick reaction to an object, with optional variables associated with it
-ActorBlock.prototype.addMouseClickReaction = function (reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addMouseClickReaction = function (reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	CANVASMANAGER.mouseClickEvent.subscribe(this);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addMouseClickReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addMouseClickReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.mouseClickReactions.length; i++) {
+		if (reactionName == this.mouseClickReactions[i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		var index = -1;
-		for (var i = 0; i < this.mouseClickReactions.length; i++) {
-			if (reactionName == this.mouseClickReactions[i].reactionName) {
-				index = i;
-				break;
-			}
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.mouseClickReactions.push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.mouseClickReactions.push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to MouseClick events, 
+// and adds a mouseClick reaction to an object's children, with optional variables associated with it
+ActorBlock.prototype.addMouseClickReactionToChildren = function (reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addMouseClickReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4156,7 +3853,7 @@ ActorBlock.prototype.removeMouseClickReaction = function (reaction) {
 
 	var reactionName = reaction.reactionName;
 	if (!reactionName) {
-		reactionName = getFunctionName(reaction);
+		reactionName = COMMON.getFunctionName(reaction);
 	}
 
 	var index = -1;
@@ -4176,10 +3873,6 @@ ActorBlock.prototype.removeMouseClickReaction = function (reaction) {
 		delete this.behaviorVars[reactionName];
 	}
 
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].removeMouseClickReaction(reaction);
-	}
-
 	if (this.mouseClickReactions.length == 0) {
 		CANVASMANAGER.mouseClickEvent.unsubscribe(this);
 	}
@@ -4188,15 +3881,37 @@ ActorBlock.prototype.removeMouseClickReaction = function (reaction) {
 // Public function
 // Input parameters: a function
 // Returns: nothing
+// Description: removes a mouse click reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeMouseClickReactionFromChildren(clicked);
+ActorBlock.prototype.removeMouseClickReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeMouseClickReaction(reaction);
+	}
+}
+
+
+// Public function
+// Input parameters: a function
+// Returns: nothing
 // Description: removes all mouse click reactions from an object, including behavior variables
 // Example: myblockCluster.removeAllMouseClickReactions();
 ActorBlock.prototype.removeAllMouseClickReactions = function () {
-	// for (var reaction in this.mouseClickReactions) {
-	// 	this.removeMouseClickReaction(reaction);
-	// }
-
 	while (this.mouseClickReactions.length > 0) {
 		this.removeMouseClickReaction(this.mouseClickReactions[0]);
+	}
+}
+
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes all mouse click reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllMouseClickReactionsFromChildren();
+ActorBlock.prototype.removeAllMouseClickReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllMouseClickReactions;
 	}
 }
 
@@ -4218,50 +3933,52 @@ ActorBlock.prototype.reactToMouseDownEvent = function(mouseEvent) {
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to MouseDown events, 
 // and adds a mouseDown reaction to an object, with optional variables associated with it
-ActorBlock.prototype.addMouseDownReaction = function (reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addMouseDownReaction = function (reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	CANVASMANAGER.mouseDownEvent.subscribe(this);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addMouseDownReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addMouseDownReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.mouseDownReactions.length; i++) {
+		if (reactionName == this.mouseDownReactions[i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		var index = -1;
-		for (var i = 0; i < this.mouseDownReactions.length; i++) {
-			if (reactionName == this.mouseDownReactions[i].reactionName) {
-				index = i;
-				break;
-			}
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.mouseDownReactions.push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.mouseDownReactions.push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to MouseDown events, 
+// and adds a mouseDown reaction to an object's children, with optional variables associated with it
+ActorBlock.prototype.addMouseDownReactionToChildren = function (reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addMouseDownReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4276,7 +3993,7 @@ ActorBlock.prototype.removeMouseDownReaction = function (reaction) {
 
 	var reactionName = reaction.reactionName;
 	if (!reactionName) {
-		reactionName = getFunctionName(reaction);
+		reactionName = COMMON.getFunctionName(reaction);
 	}
 
 	var index = -1;
@@ -4296,12 +4013,22 @@ ActorBlock.prototype.removeMouseDownReaction = function (reaction) {
 		delete this.behaviorVars[reactionName];
 	}
 
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].removeMouseDownReaction(reaction);
-	}
-
 	if (this.mouseDownReactions.length == 0) {
 		CANVASMANAGER.mouseDownEvent.unsubscribe(this);
+	}
+}
+
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes a mouse down reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeMouseDownReactionFromChildren(downed);
+ActorBlock.prototype.removeMouseDownReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeMouseDownReaction(reaction);
 	}
 }
 
@@ -4311,12 +4038,19 @@ ActorBlock.prototype.removeMouseDownReaction = function (reaction) {
 // Description: removes all mouse down reactions from an object, including behavior variables
 // Example: myblockCluster.removeAllMouseDownReactions();
 ActorBlock.prototype.removeAllMouseDownReactions = function () {
-	// for (var reaction in this.mouseDownReactions) {
-	// 	this.removeMouseDownReaction(reaction);
-	// }
-
 	while (this.mouseDownReactions.length > 0) {
 		this.removeMouseDownReaction(this.mouseDownReactions[0]);
+	}
+}
+
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes all mouse down reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllMouseDownReactionsFromChildren();
+ActorBlock.prototype.removeAllMouseDownReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllMouseDownReactions();
 	}
 }
 
@@ -4338,50 +4072,52 @@ ActorBlock.prototype.reactToMouseUpEvent = function(mouseEvent) {
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to MouseUp events, 
 // and adds a mouseUp reaction to an object, with optional variables associated with it
-ActorBlock.prototype.addMouseUpReaction = function (reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addMouseUpReaction = function (reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	CANVASMANAGER.mouseUpEvent.subscribe(this);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addMouseUpReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addMouseUpReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.mouseUpReactions.length; i++) {
+		if (reactionName == this.mouseUpReactions[i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		var index = -1;
-		for (var i = 0; i < this.mouseUpReactions.length; i++) {
-			if (reactionName == this.mouseUpReactions[i].reactionName) {
-				index = i;
-				break;
-			}
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.mouseUpReactions.push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.mouseUpReactions.push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to MouseUp events, 
+// and adds a mouseUp reaction to an object's children, with optional variables associated with it
+ActorBlock.prototype.addMouseUpReactionToChildren = function (reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addMouseUpReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4407,21 +4143,30 @@ ActorBlock.prototype.removeMouseUpReaction = function (reaction) {
 		}
 	}
 
-	//var index = this.mouseUpReactions.indexOf(reaction);
 	if (index > -1) {
 		this.mouseUpReactions.splice(index,1);
 		for (var innerProp in this.behaviorVars[reactionName]) {
 			delete this.behaviorVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[getFunctionName(reaction)];
-	}
-
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].removeMouseUpReaction(reaction);
+		delete this.behaviorVars[reactionName];
 	}
 
 	if (this.mouseUpReactions.length == 0) {
 		CANVASMANAGER.mouseUpEvent.unsubscribe(this);
+	}
+}
+
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes a mouse up reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeMouseUpReactionFromChildren(released);
+ActorBlock.prototype.removeMouseUpReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeMouseUpReaction(reaction);
 	}
 }
 
@@ -4431,12 +4176,19 @@ ActorBlock.prototype.removeMouseUpReaction = function (reaction) {
 // Description: removes all mouse up reactions from an object, including behavior variables
 // Example: myblockCluster.removeAllMouseUpReactions();
 ActorBlock.prototype.removeAllMouseUpReactions = function () {
-	// for (var reaction in this.mouseUpReactions) {
-	// 	this.removeMouseUpReaction(reaction);
-	// }
-
 	while (this.mouseUpReactions.length > 0) {
 		this.removeMouseUpReaction(this.mouseUpReactions[0]);
+	}
+}
+
+// Public function
+// Input parameters: none
+// Returns: nothing
+// Description: removes all mouse up reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllMouseUpReactionsFromChildren();
+ActorBlock.prototype.removeAllMouseUpReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllMouseUpReactions();
 	}
 }
 
@@ -4451,6 +4203,19 @@ ActorBlock.prototype.removeAllMouseReactions = function () {
 	this.removeAllMouseClickReactions();
 	this.removeAllMouseDownReactions();
 	this.removeAllMouseUpReactions();
+}
+
+// Public function
+// Input parameters: none
+// Returns: nothing
+// Description: removes all mouse over/out/click/down/up reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllMouseReactionsFromChildren();
+ActorBlock.prototype.removeAllMouseReactionsFromChildren = function () {
+	this.removeAllMouseOverReactionsFromChildren();
+	this.removeAllMouseOutReactionsFromChildren();
+	this.removeAllMouseClickReactionsFromChildren();
+	this.removeAllMouseDownReactionsFromChildren();
+	this.removeAllMouseUpReactionsFromChildren();
 }
 
 // Private function
@@ -4472,56 +4237,58 @@ ActorBlock.prototype.reactToKeyPressEvent = function(keyboardEvent,keyName) {
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to keyPress events, 
 // and adds a keyPress reaction for any key to an object, with optional variables associated with it
-ActorBlock.prototype.addAnyKeyPressReaction = function(reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addAnyKeyPressReaction = function(reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	var name = KEYCODES.getStringFromKeyCode(KEYCODES.ANYKEY);
 
 	CANVASMANAGER.keyboardEvent.subscribeToKeyPress(this,KEYCODES.ANYKEY);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addAnyKeyPressReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addAnyKeyPressReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	if (this.keyPressReactions[name] == undefined) {
+		this.keyPressReactions[name] = new Array();
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.keyPressReactions[name].length; i++) {
+		if (reactionName == this.keyPressReactions[name][i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		if (this.keyPressReactions[name] == undefined) {
-			this.keyPressReactions[name] = new Array();
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.keyPressReactions[name].push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		var index = -1;
-		for (var i = 0; i < this.keyPressReactions[name].length; i++) {
-			if (reactionName == this.keyPressReactions[name][i].reactionName) {
-				index = i;
-				break;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to keyPress events, 
+// and adds a keyPress reaction for any key to an object's children, with optional variables associated with it
+ActorBlock.prototype.addAnyKeyPressReactionToChildren = function(reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.keyPressReactions[name].push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[getFunctionName(reaction)] = vars;
-			}
-		}
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addAnyKeyPressReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4539,7 +4306,7 @@ ActorBlock.prototype.removeAnyKeyPressReaction = function (reaction) {
 	if (this.keyPressReactions[name] != undefined) {
 		var reactionName = reaction.reactionName;
 		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
+			reactionName = COMMON.getFunctionName(reaction);
 		}
 
 		var index = -1;
@@ -4557,10 +4324,20 @@ ActorBlock.prototype.removeAnyKeyPressReaction = function (reaction) {
 			}
 			delete this.behaviorVars[reactionName];
 		}
+	}
+}
 
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].removeAnyKeyPressReaction(reaction);
-		}
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes an any key press reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeAnyKeyPressReactionFromChildren(anyKeyPressed);
+ActorBlock.prototype.removeAnyKeyPressReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAnyKeyPressReaction(reaction);
 	}
 }
 
@@ -4583,56 +4360,58 @@ ActorBlock.prototype.reactToKeyDownEvent = function(keyboardEvent,keyName) {
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to any keyDown events, 
 // and adds a keyDown reaction for any key to an object, with optional variables associated with it
-ActorBlock.prototype.addAnyKeyDownReaction = function(reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addAnyKeyDownReaction = function(reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	var name = KEYCODES.getStringFromKeyCode(KEYCODES.ANYKEY);
 
 	CANVASMANAGER.keyboardEvent.subscribeToKeyDown(this,KEYCODES.ANYKEY);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addAnyKeyDownReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addAnyKeyDownReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	if (this.keyDownReactions[name] == undefined) {
+		this.keyDownReactions[name] = new Array();
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.keyDownReactions[name].length; i++) {
+		if (reactionName == this.keyDownReactions[name][i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		if (this.keyDownReactions[name] == undefined) {
-			this.keyDownReactions[name] = new Array();
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.keyDownReactions[name].push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		var index = -1;
-		for (var i = 0; i < this.keyDownReactions[name].length; i++) {
-			if (reactionName == this.keyDownReactions[name][i].reactionName) {
-				index = i;
-				break;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to any keyDown events, 
+// and adds a keyDown reaction for any key to an object's children, with optional variables associated with it
+ActorBlock.prototype.addAnyKeyDownReactionToChildren = function(reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
 
-		if (this.keyDownReactions[name].indexOf(reaction) == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.keyDownReactions[name].push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[getFunctionName(reaction)] = vars;
-			}
-		}
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addAnyKeyDownReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4650,7 +4429,7 @@ ActorBlock.prototype.removeAnyKeyDownReaction = function (reaction) {
 	if (this.keyDownReactions[name] != undefined) {
 		var reactionName = reaction.reactionName;
 		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
+			reactionName = COMMON.getFunctionName(reaction);
 		}
 
 		var index = -1;
@@ -4663,15 +4442,25 @@ ActorBlock.prototype.removeAnyKeyDownReaction = function (reaction) {
 
 		if (index > -1) {
 			this.keyDownReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[getFunctionName(reaction)]) {
-				delete this.behaviorVars[getFunctionName(reaction)][innerProp];
+			for (var innerProp in this.behaviorVars[reactionName]) {
+				delete this.behaviorVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[getFunctionName(reaction)];
+			delete this.behaviorVars[reactionName];
 		}
+	}
+}
 
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].removeAnyKeyDownReaction(reaction);
-		}
+// Public function
+// Input parameters: a function
+// Returns: nothing
+// Description: removes an any key down reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeAnyKeyDownReactionFromChildren(anyKeyDowned);
+ActorBlock.prototype.removeAnyKeyDownReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAnyKeyDownReaction(reaction);
 	}
 }
 
@@ -4694,56 +4483,58 @@ ActorBlock.prototype.reactToKeyUpEvent = function(keyboardEvent,keyName) {
 }
 
 // Public function
-// Input parameters: a function, a variable object, and a boolean
+// Input parameters: a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to any keyUp events, 
 // and adds a keyUp reaction for any key to an object, with optional variables associated with it
-ActorBlock.prototype.addAnyKeyUpReaction = function(reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addAnyKeyUpReaction = function(reaction, vars) {
 	PARAMS.initializeValidation();
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	var name = KEYCODES.getStringFromKeyCode(KEYCODES.ANYKEY);
 	
 	CANVASMANAGER.keyboardEvent.subscribeToKeyUp(this,KEYCODES.ANYKEY);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addAnyKeyUpReaction(reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addAnyKeyUpReaction(reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	if (this.keyUpReactions[name] == undefined) {
+		this.keyUpReactions[name] = new Array();
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.keyUpReactions[name].length; i++) {
+		if (reactionName == this.keyUpReactions[name][i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		if (this.keyUpReactions[name] == undefined) {
-			this.keyUpReactions[name] = new Array();
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.keyUpReactions[name].push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		var index = -1;
-		for (var i = 0; i < this.keyUpReactions[name].length; i++) {
-			if (reactionName == this.keyUpReactions[name][i].reactionName) {
-				index = i;
-				break;
-			}
-		}
+// Public function
+// Input parameters: a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to any keyUp events, 
+// and adds a keyUp reaction for any key to an object's children, with optional variables associated with it
+ActorBlock.prototype.addAnyKeyUpReactionToChildren = function(reaction, vars) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.keyUpReactions[name].push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[getFunctionName(reaction)] = vars;
-			}
-		}
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addAnyKeyUpReaction(reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4761,7 +4552,7 @@ ActorBlock.prototype.removeAnyKeyUpReaction = function (reaction) {
 	if (this.keyUpReactions[name] != undefined) {
 		var reactionName = reaction.reactionName;
 		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
+			reactionName = COMMON.getFunctionName(reaction);
 		}
 
 		var index = -1;
@@ -4779,65 +4570,78 @@ ActorBlock.prototype.removeAnyKeyUpReaction = function (reaction) {
 			}
 			delete this.behaviorVars[reactionName];
 		}
-
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].removeAnyKeyUpReaction(reaction);
-		}
 	}
 }
 
 // Public function
-// Input parameters: a keycode, a function, a variable object, and a boolean
+// Input parameters: a function
+// Returns: nothing
+// Description: removes an any key up reaction from an object's children, including behavior variables
+// Example: myblockCluster.removeAnyKeyUpReactionFromChildren(anyKeyReleased);
+ActorBlock.prototype.removeAnyKeyUpReactionFromChildren = function (reaction) {
+	PARAMS.initializeValidation();
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAnyKeyUpReaction(reaction);
+	}
+}
+
+// Public function
+// Input parameters: a keycode, a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to keyPress events, 
 // and adds a keyPress reaction associated with the input keycode to an object, with optional variables associated with it
-ActorBlock.prototype.addKeyPressReaction = function(keyCode, reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addKeyPressReaction = function(keyCode, reaction, vars) {
 	PARAMS.initializeValidation();
 	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	var name = KEYCODES.getStringFromKeyCode(keyCode);
 
 	CANVASMANAGER.keyboardEvent.subscribeToKeyPress(this,keyCode);
 		
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addKeyPressReaction(keyCode, reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addKeyPressReaction(keyCode, reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	if (this.keyPressReactions[name] == undefined) {
+		this.keyPressReactions[name] = new Array();
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.keyPressReactions[name].length; i++) {
+		if (reactionName == this.keyPressReactions[name][i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		if (this.keyPressReactions[name] == undefined) {
-			this.keyPressReactions[name] = new Array();
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.keyPressReactions[name].push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		var index = -1;
-		for (var i = 0; i < this.keyPressReactions[name].length; i++) {
-			if (reactionName == this.keyPressReactions[name][i].reactionName) {
-				index = i;
-				break;
-			}
-		}
+// Public function
+// Input parameters: a keycode, a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to keyPress events, 
+// and adds a keyPress reaction associated with the input keycode to an object's children, with optional variables associated with it
+ActorBlock.prototype.addKeyPressReactionToChildren = function(keyCode, reaction, vars) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.keyPressReactions[name].push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addKeyPressReaction(keyCode, reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4856,7 +4660,7 @@ ActorBlock.prototype.removeKeyPressReaction = function (keyCode, reaction) {
 	if (this.keyPressReactions[name] != undefined) {
 		var reactionName = reaction.reactionName;
 		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
+			reactionName = COMMON.getFunctionName(reaction);
 		}
 
 		var index = -1;
@@ -4874,10 +4678,21 @@ ActorBlock.prototype.removeKeyPressReaction = function (keyCode, reaction) {
 			}
 			delete this.behaviorVars[reactionName];
 		}
+	}
+}
 
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].removeKeyPressReaction(keyCode, reaction);
-		}
+// Public function
+// Input parameters: a keycode, a function
+// Returns: nothing
+// Description: removes a key press reaction from an object's children for a given keycode, including behavior variables
+// Example: myblockCluster.removeKeyPressReactionFromChildren(KEYCODES.A, keyPressed);
+ActorBlock.prototype.removeKeyPressReactionFromChildren = function (keyCode, reaction) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeKeyPressReaction(keyCode, reaction);
 	}
 }
 
@@ -4892,11 +4707,22 @@ ActorBlock.prototype.removeAllKeyPressReactionsForKeyCode = function (keyCode) {
 
 	var name = KEYCODES.getStringFromKeyCode(keyCode);
 
-	// for (var reaction in this.keyPressReactions[name]) {
-	// 	this.removeKeyPressReaction(keyCode, reaction);
-	// }
 	while (this.keyPressReactions[name].length > 0) {
 		this.removeKeyPressReaction(keyCode, this.keyPressReactions[name][0]);
+	}
+}
+
+// Public function
+// Input parameters: a keycode
+// Returns: nothing
+// Description: removes all key press reactions from an object's children for a given keycode, including behavior variables
+// Example: myblockCluster.removeAllKeyPressReactionsForKeyCodeFromChildren(KEYCODES.A);
+ActorBlock.prototype.removeAllKeyPressReactionsForKeyCodeFromChildren = function (keyCode) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllKeyPressReactionsForKeyCode(keyCode);
 	}
 }
 
@@ -4912,57 +4738,71 @@ ActorBlock.prototype.removeAllKeyPressReactions = function () {
 }
 
 // Public function
-// Input parameters: a keycode, a function, a variable object, and a boolean
+// Input parameters: none
+// Returns: nothing
+// Description: removes all key press reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllKeyPressReactionsFromChildren();
+ActorBlock.prototype.removeAllKeyPressReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllKeyPressReactions();
+	}
+}
+
+// Public function
+// Input parameters: a keycode, a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to any keyDown events, 
 // and adds a keyDown reaction associated with the input keycode to an object, with optional variables associated with it
-ActorBlock.prototype.addKeyDownReaction = function(keyCode, reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addKeyDownReaction = function(keyCode, reaction, vars) {
 	PARAMS.initializeValidation();
 	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	var name = KEYCODES.getStringFromKeyCode(keyCode);
 	
 	CANVASMANAGER.keyboardEvent.subscribeToKeyDown(this,keyCode);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addKeyDownReaction(keyCode, reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addKeyDownReaction(keyCode, reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	if (this.keyDownReactions[name] == undefined) {
+		this.keyDownReactions[name] = new Array();
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.keyDownReactions[name].length; i++) {
+		if (reactionName == this.keyDownReactions[name][i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		if (this.keyDownReactions[name] == undefined) {
-			this.keyDownReactions[name] = new Array();
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.keyDownReactions[name].push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		var index = -1;
-		for (var i = 0; i < this.keyDownReactions[name].length; i++) {
-			if (reactionName == this.keyDownReactions[name][i].reactionName) {
-				index = i;
-				break;
-			}
-		}
+// Public function
+// Input parameters: a keycode, a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to any keyDown events, 
+// and adds a keyDown reaction associated with the input keycode to an object's children, with optional variables associated with it
+ActorBlock.prototype.addKeyDownReactionToChildren = function(keyCode, reaction, vars) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.keyDownReactions[name].push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addKeyDownReaction(keyCode, reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -4981,7 +4821,7 @@ ActorBlock.prototype.removeKeyDownReaction = function (keyCode, reaction) {
 	if (this.keyDownReactions[name] != undefined) {
 		var reactionName = reaction.reactionName;
 		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
+			reactionName = COMMON.getFunctionName(reaction);
 		}
 
 		var index = -1;
@@ -4999,10 +4839,21 @@ ActorBlock.prototype.removeKeyDownReaction = function (keyCode, reaction) {
 			}
 			delete this.behaviorVars[reactionName];
 		}
+	}
+}
 
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].removeKeyDownReaction(keyCode, reaction);
-		}
+// Public function
+// Input parameters: a keycode, a function
+// Returns: nothing
+// Description: removes a key down reaction from an object's children for a given keycode, including behavior variables
+// Example: myblockCluster.removeKeyDownReactionFromChildren(KEYCODES.A, keyDowned);
+ActorBlock.prototype.removeKeyDownReactionFromChildren = function (keyCode, reaction) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeKeyDownReaction(keyCode, reaction);
 	}
 }
 
@@ -5017,12 +4868,22 @@ ActorBlock.prototype.removeAllKeyDownReactionsForKeyCode = function (keyCode) {
 
 	var name = KEYCODES.getStringFromKeyCode(keyCode);
 
-	// for (var reaction in this.keyDownReactions[name]) {
-	// 	this.removeKeyDownReaction(keyCode, reaction);
-	// }
-
 	while (this.keyDownReactions[name].length > 0) {
 		this.removeKeyDownReaction(keyCode, this.keyDownReactions[name][0]);
+	}
+}
+
+// Public function
+// Input parameters: a keycode
+// Returns: nothing
+// Description: removes all key down reactions from an object's children for a given keycode, including behavior variables
+// Example: myblockCluster.removeAllKeyDownReactionsForKeyCodeFromChildren(KEYCODES.A);
+ActorBlock.prototype.removeAllKeyDownReactionsForKeyCodeFromChildren = function (keyCode) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllKeyDownReactionsForKeyCode(keyCode);
 	}
 }
 
@@ -5040,57 +4901,71 @@ ActorBlock.prototype.removeAllKeyDownReactions = function () {
 }
 
 // Public function
-// Input parameters: a keycode, a function, a variable object, and a boolean
+// Input parameters: none
+// Returns: nothing
+// Description: removes all single key down reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllKeyDownReactionsFromChildren();
+ActorBlock.prototype.removeAllKeyDownReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllKeyDownReactions();
+	}
+}
+
+// Public function
+// Input parameters: a keycode, a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to any keyUp events, 
 // and adds a keyUp reaction associated with the input keycode to an object, with optional variables associated with it
-ActorBlock.prototype.addKeyUpReaction = function(keyCode, reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addKeyUpReaction = function(keyCode, reaction, vars) {
 	PARAMS.initializeValidation();
 	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	var name = KEYCODES.getStringFromKeyCode(keyCode);
 	
 	CANVASMANAGER.keyboardEvent.subscribeToKeyUp(this,keyCode);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addKeyUpReaction(keyCode, reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addKeyUpReaction(keyCode, reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	if (this.keyUpReactions[name] == undefined) {
+		this.keyUpReactions[name] = new Array();
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.keyUpReactions[name].length; i++) {
+		if (reactionName == this.keyUpReactions[name][i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		if (this.keyUpReactions[name] == undefined) {
-			this.keyUpReactions[name] = new Array();
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.keyUpReactions[name].push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		var index = -1;
-		for (var i = 0; i < this.keyUpReactions[name].length; i++) {
-			if (reactionName == this.keyUpReactions[name][i].reactionName) {
-				index = i;
-				break;
-			}
-		}
+// Public function
+// Input parameters: a keycode, a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to any keyUp events, 
+// and adds a keyUp reaction associated with the input keycode to an object's children, with optional variables associated with it
+ActorBlock.prototype.addKeyUpReactionToChildren = function(keyCode, reaction, vars) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.keyUpReactions[name].push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addKeyUpReaction(keyCode, reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -5109,7 +4984,7 @@ ActorBlock.prototype.removeKeyUpReaction = function (keyCode, reaction) {
 	if (this.keyUpReactions[name] != undefined) {
 		var reactionName = reaction.reactionName;
 		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
+			reactionName = COMMON.getFunctionName(reaction);
 		}
 
 		var index = -1;
@@ -5120,7 +4995,6 @@ ActorBlock.prototype.removeKeyUpReaction = function (keyCode, reaction) {
 			}
 		}
 
-		//var index = this.keyUpReactions[name].indexOf(reaction);
 		if (index > -1) {
 			this.keyUpReactions[name].splice(index,1);
 			for (var innerProp in this.behaviorVars[reactionName]) {
@@ -5128,10 +5002,21 @@ ActorBlock.prototype.removeKeyUpReaction = function (keyCode, reaction) {
 			}
 			delete this.behaviorVars[reactionName];
 		}
+	}
+}
 
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].removeKeyUpReaction(keyCode, reaction);
-		}
+// Public function
+// Input parameters: a keycode, a function
+// Returns: nothing
+// Description: removes a key up reaction from an object's children for a given keycode, including behavior variables
+// Example: myblockCluster.removeKeyUpReactionFromChildren(KEYCODES.A, keyReleased);
+ActorBlock.prototype.removeKeyUpReactionFromChildren = function (keyCode, reaction) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeKeyUpReaction(keyCode, reaction);
 	}
 }
 
@@ -5146,12 +5031,22 @@ ActorBlock.prototype.removeAllKeyUpReactionsForKeyCode = function (keyCode) {
 
 	var name = KEYCODES.getStringFromKeyCode(keyCode);
 
-	// for (var reaction in this.keyUpReactions[name]) {
-	// 	this.removeKeyUpReaction(keyCode, reaction);
-	// }
-
 	while (this.keyUpReactions[name].length > 0) {
 		this.removeKeyUpReaction(keyCode, this.keyUpReactions[name][0]);
+	}
+}
+
+// Public function
+// Input parameters: a keycode, a function
+// Returns: nothing
+// Description: removes all key up reactions from an object's children for a given keycode, including behavior variables
+// Example: myblockCluster.removeAllKeyUpReactionsForKeyCodeFromChildren(KEYCODES.A);
+ActorBlock.prototype.removeAllKeyUpReactionsForKeyCodeFromChildren = function (keyCode) {
+	PARAMS.initializeValidation();
+	keyCode = PARAMS.validateParam(PARAMS.INTEGER, keyCode);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllKeyUpReactionsForKeyCode(keyCode);
 	}
 }
 
@@ -5167,58 +5062,73 @@ ActorBlock.prototype.removeAllKeyUpReactions = function () {
 }
 
 // Public function
-// Input parameters: an array of keycodes, a function, a variable object, and a boolean
+// Input parameters: none
+// Returns: nothing
+// Description: removes all key up reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllKeyUpReactionsFromChildren();
+ActorBlock.prototype.removeAllKeyUpReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllKeyUpReactions();
+	}
+}
+
+// Public function
+// Input parameters: an array of keycodes, a function, a variable object
 // Returns: nothing
 // Description: subscribes an object to any keyDown events, 
 // and adds a keyDown reaction associated with the input combination of keycodes to an object, 
 // with optional variables associated with it
-ActorBlock.prototype.addKeyCombinationReaction = function(keyCodes, reaction, vars, propagateToChildren) {
+ActorBlock.prototype.addKeyCombinationReaction = function(keyCodes, reaction, vars) {
 	PARAMS.initializeValidation();
 	keyCodes = PARAMS.validateParam(PARAMS.ARRAYOFINTEGER, keyCodes);
 	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
 	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
-	propagateToChildren = PARAMS.validateParam(PARAMS.BOOLEAN, propagateToChildren, false);
 
 	var name = KEYCODES.getStringFromKeyCodes(keyCodes);
 	
 	CANVASMANAGER.keyboardEvent.subscribeToKeyCombination(this,keyCodes);
 
-	if (propagateToChildren == true) {
-		for (var i = 0; i < this.children.length; i++) {
-			if (this.children[i].children.length == 0) {
-				this.children[i].addKeyCombinationReaction(keyCodes, reaction, extend(vars, {}));
-			}
-			else {
-				this.children[i].addKeyCombinationReaction(keyCodes, reaction, extend(vars, {}), true);
-			}
+	var reactionName = reaction.reactionName;
+	if (!reactionName) {
+		reactionName = COMMON.getFunctionName(reaction);
+	}
+
+	if (this.keyDownReactions[name] == undefined) {
+		this.keyDownReactions[name] = new Array();
+	}
+
+	var index = -1;
+	for (var i = 0; i < this.keyDownReactions[name].length; i++) {
+		if (reactionName == this.keyDownReactions[name][i].reactionName) {
+			index = i;
+			break;
 		}
 	}
-	else {
-		var reactionName = reaction.reactionName;
-		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
-		}
 
-		if (this.keyDownReactions[name] == undefined) {
-			this.keyDownReactions[name] = new Array();
+	if (index == -1) {
+		var boundReaction = reaction.bind(vars);
+		boundReaction.reactionName = reactionName;
+		this.keyDownReactions[name].push(boundReaction);
+		if (vars != undefined) {
+			this.behaviorVars[reactionName] = vars;
 		}
+	}
+}
 
-		var index = -1;
-		for (var i = 0; i < this.keyDownReactions[name].length; i++) {
-			if (reactionName == this.keyDownReactions[name][i].reactionName) {
-				index = i;
-				break;
-			}
-		}
+// Public function
+// Input parameters: an array of keycodes, a function, a variable object
+// Returns: nothing
+// Description: subscribes an object's children to any keyDown events, 
+// and adds a keyDown reaction associated with the input combination of keycodes to an object's children, 
+// with optional variables associated with it
+ActorBlock.prototype.addKeyCombinationReactionToChildren = function(keyCodes, reaction, vars) {
+	PARAMS.initializeValidation();
+	keyCodes = PARAMS.validateParam(PARAMS.ARRAYOFINTEGER, keyCodes);
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+	vars = PARAMS.validateParam(PARAMS.OBJECT, vars);
 
-		if (index == -1) {
-			var boundReaction = reaction.bind(vars);
-			boundReaction.reactionName = reactionName;
-			this.keyDownReactions[name].push(boundReaction);
-			if (vars != undefined) {
-				this.behaviorVars[reactionName] = vars;
-			}
-		}
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].addKeyCombinationReaction(keyCodes, reaction, COMMON.extend(vars, {}));
 	}
 }
 
@@ -5237,7 +5147,7 @@ ActorBlock.prototype.removeKeyCombinationReaction = function (keyCodes, reaction
 	if (this.keyDownReactions[name] != undefined) {
 		var reactionName = reaction.reactionName;
 		if (!reactionName) {
-			reactionName = getFunctionName(reaction);
+			reactionName = COMMON.getFunctionName(reaction);
 		}
 
 		var index = -1;
@@ -5255,10 +5165,21 @@ ActorBlock.prototype.removeKeyCombinationReaction = function (keyCodes, reaction
 			}
 			delete this.behaviorVars[reactionName];
 		}
+	}
+}
 
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].removeKeyCombinationReaction(keyCodes, reaction);
-		}
+// Public function
+// Input parameters: an array of keycodes, a function
+// Returns: nothing
+// Description: removes a key combination reaction from an object's children for a given array of keycodes, including behavior variables
+// Example: myblockCluster.removeKeyCombinationReactionFromChildren([KEYCODES.A,KEYCODES.B,KEYCODES.c], keyCombinationPressed);
+ActorBlock.prototype.removeKeyCombinationReactionFromChildren = function (keyCodes, reaction) {
+	PARAMS.initializeValidation();
+	keyCodes = PARAMS.validateParam(PARAMS.ARRAYOFINTEGER, keyCodes);
+	reaction = PARAMS.validateParam(PARAMS.FUNCTION, reaction);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeKeyCombinationReaction(keyCodes, reaction);
 	}
 }
 
@@ -5273,12 +5194,22 @@ ActorBlock.prototype.removeAllKeyCombinationReactionsForKeyCodes = function (key
 
 	var name = KEYCODES.getStringFromKeyCode(keyCodes);
 
-	// for (var reaction in this.keyDownReactions[name]) {
-	// 	this.removeKeyCombinationReaction(keyCode, reaction);
-	// }
-
 	while (this.keyDownReactions[name].length > 0) {
 		this.removeKeyCombinationReaction(keyCodes, this.keyDownReactions[name][0]);
+	}
+}
+
+// Public function
+// Input parameters: an array of keycodes
+// Returns: nothing
+// Description: removes all key combination reactions from an object's children for a given array of keycodes, including behavior variables
+// Example: myblockCluster.removeAllKeyCombinationReactionsForKeyCodesFromChildren([KEYCODES.A,KEYCODES.B,KEYCODES.c]);
+ActorBlock.prototype.removeAllKeyCombinationReactionsForKeyCodesFromChildren = function (keyCodes) {
+	PARAMS.initializeValidation();
+	keyCodes = PARAMS.validateParam(PARAMS.ARRAYOFINTEGER, keyCodes);
+
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllKeyCombinationReactionsForKeyCodes(keyCodes);
 	}
 }
 
@@ -5298,13 +5229,12 @@ ActorBlock.prototype.removeAllKeyCombinationReactions = function () {
 // Public function
 // Input parameters: none
 // Returns: nothing
-// Description: removes all key press/up/down/combination reactions from an object, including behavior variables
-// Example: myblockCluster.removeAllKeyReactions();
-ActorBlock.prototype.removeAllKeyReactions = function () {
-	this.removeAllKeyPressReactions();
-	this.removeAllKeyDownReactions();
-	this.removeAllKeyUpReactions();
-	this.removeAllKeyCombinationReactions();
+// Description: removes all key combination reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllKeyCombinationReactionsFromChildren();
+ActorBlock.prototype.removeAllKeyCombinationReactionsFromChildren = function () {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].removeAllKeyCombinationReactions();
+	}
 }
 
 // Public function
@@ -5317,6 +5247,18 @@ ActorBlock.prototype.removeAllKeyReactions = function () {
 	this.removeAllKeyDownReactions();
 	this.removeAllKeyUpReactions();
 	this.removeAllKeyCombinationReactions();
+}
+
+// Public function
+// Input parameters: none
+// Returns: nothing
+// Description: removes all key press/up/down/combination reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllKeyReactionsFromChildren();
+ActorBlock.prototype.removeAllKeyReactionsFromChildren = function () {
+	this.removeAllKeyPressReactionsFromChildren();
+	this.removeAllKeyDownReactionsFromChildren();
+	this.removeAllKeyUpReactionsFromChildren();
+	this.removeAllKeyCombinationReactionsFromChildren();
 }
 
 // Public function
@@ -5327,6 +5269,16 @@ ActorBlock.prototype.removeAllKeyReactions = function () {
 ActorBlock.prototype.removeAllReactions = function () {
 	this.removeAllMouseReactions();
 	this.removeAllKeyReactions();
+}
+
+// Public function
+// Input parameters: none
+// Returns: nothing
+// Description: removes all mouse and key reactions from an object's children, including behavior variables
+// Example: myblockCluster.removeAllReactionsFromChildren();
+ActorBlock.prototype.removeAllReactionsFromChildren = function () {
+	this.removeAllMouseReactionsFromChildren();
+	this.removeAllKeyReactionsFromChildren();
 }
 
 ActorBlock.prototype.destroy = function() {
@@ -5393,6 +5345,578 @@ ActorBlock.prototype.destroy = function() {
 	}
 
 	Block.prototype.destroy.call(this);
+}
+var PlayerTraits = function() {
+	// LOG.write("PlayerBlock constructor called", LOG.VERBOSE);
+	// ActorBlock.call(this);
+}
+
+PlayerTraits.prototype = new Traits();
+
+//PlayerBlock.prototype = new ActorBlock();
+
+PlayerTraits.prototype.play = function() {
+	throw new Error("Block has learned PlayerTraits, but hasn't implemented the 'play' function.");
+}
+
+PlayerTraits.prototype.pause = function() {
+	throw new Error("Block has learned PlayerTraits, but hasn't implemented the 'pause' function.");
+}
+
+PlayerTraits.prototype.unpause = function() {
+	throw new Error("Block has learned PlayerTraits, but hasn't implemented the 'unpause' function.");
+}
+
+PlayerTraits.prototype.playPause = function() {
+	throw new Error("Block has learned PlayerTraits, but hasn't implemented the 'playPause' function.");
+}
+
+PlayerTraits.prototype.stop = function() {
+	throw new Error("Block has learned PlayerTraits, but hasn't implemented the 'stop' function.");
+}
+
+PlayerTraits.prototype.getVolume = function() {
+	throw new Error("Block has learned PlayerTraits, but hasn't implemented the 'getVolume' function.");
+}
+
+PlayerTraits.prototype.setVolume = function() {
+	throw new Error("Block has learned PlayerTraits, but hasn't implemented the 'setVolume' function.");
+}
+
+// PlayerTraits.prototype.destroy = function() {
+// 	ActorBlock.prototype.destroy.call(this);
+// }
+
+
+var ShatterTraits = function() {
+	var shattered = false;
+	var counter = 0;
+
+	this._getShattered = function() { return shattered; };
+	this._setShattered = function(val) { 
+		shattered = val; 
+		counter++;
+	};
+
+	this.shattered = shattered;
+}
+
+ShatterTraits.prototype = new Traits();
+
+ShatterTraits.prototype.getCurrentFrame = function() {
+	throw new Error("Block has learned ShatterTraits, but hasn't implemented the 'getCurrentFrame' function.");
+}
+
+// Public function
+// Input parameters: the new size for the shattered blocks (integer), width of source image (integer), height of source image (integer)
+// Returns: nothing
+// Description: shatters the source block's frames into an an array of new child blocks, 
+// each with a small part of the original image/animation
+ShatterTraits.prototype.shatter = function(newBlockSize, maxWidth, maxHeight) {
+	PARAMS.initializeValidation();
+	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
+	maxWidth = PARAMS.validateParam(PARAMS.INTEGER, maxWidth, this.width);
+	maxHeight = PARAMS.validateParam(PARAMS.INTEGER, maxHeight, this.height);
+	
+	if (!this.shattered) {
+		var blockClusterPositions = new Array();
+
+		var blockIndex = 0;
+		for (var i = 0; i < maxWidth; i += newBlockSize) {
+			for (var j = 0; j < maxHeight; j += newBlockSize) {
+				if (blockClusterPositions[blockIndex] == undefined) {
+					blockClusterPositions[blockIndex] = {"x":Math.floor(i - maxWidth/2 + newBlockSize/2), "y":Math.floor(j - maxHeight/2 + newBlockSize/2)};
+				}
+				
+				blockIndex++;
+			}
+		}
+
+		for (var i = 0; i < blockClusterPositions.length; i++) {
+			var newBlock = new FragmentBlock(this, newBlockSize, newBlockSize, blockClusterPositions[i].x, blockClusterPositions[i].y, 0);
+
+			newBlock.setMemoryCapacity(this.memoryCapacity);
+			
+			this.adoptChild(newBlock);
+		}
+
+		this.shattered = true;
+	}
+}
+
+
+// Public function
+// Input parameters: none
+// Returns: nothing
+// Description: removes child blocks resulting from shatter
+ShatterTraits.prototype.unshatter = function() {
+	for (var i = 0; i < this.children.length; i++) {
+		if (this.children[i] instanceof FragmentBlock) {
+			this.children[i].destroy();
+			this.children.splice(i,1);
+			i--;
+		}
+	}
+	this.shattered = false;
+}
+var CanvasTraits = function() { }
+
+CanvasTraits.prototype = new Traits();
+
+// Private function
+// Input parameters: canvas 2d context, list of drawing commands
+// Returns: nothing
+// Description: parses a list of drawing command objects, and applies them to the destination canvas 2d context
+CanvasTraits.prototype.parseCanvasCommands = function(dest,commands) {
+	PARAMS.initializeValidation();
+	dest = PARAMS.validateParam(PARAMS.CANVAS2DCONTEXT,dest);
+	commands = PARAMS.validateParam(PARAMS.ARRAYOFOBJECT,commands);
+
+	var saveCount = 0;
+	var restoreCount = 0;
+
+	for (var i = 0; i < commands.length; i++) {
+		var command = commands[i].command;
+		var parameters = commands[i].parameters;
+		switch(command) {
+			case "arc":
+				if (parameters.length == 5) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.arc(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4]);
+				}
+				else if (parameters.length == 6) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.BOOLEAN],
+											 parameters);
+					dest.arc(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5]);
+				}
+				break;
+
+			case "arcTo":
+				if (parameters.length == 5) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.arcTo(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4]);
+				}
+				break;
+
+			case "beginPath":
+				dest.beginPath();
+				break;
+
+			case "bezierCurveTo":
+				if (parameters.length == 6) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.bezierCurveTo(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5]);
+				}
+				break;
+
+			// should we allow this one?
+			case "clearRect":
+				if (parameters.length == 4) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.clearRect(parameters[0] - 1,parameters[1] - 1,parameters[2] + 2,parameters[3] + 2);
+				}
+				break;
+
+			case "clip":
+				dest.clip();
+				break;
+
+			case "closePath":
+				dest.closePath();
+				break;
+
+			case "createImageData":
+				// not implemented, since it returns image data
+				break;
+
+			case "createLinearGradient":
+				// not implemented, since it returns a gradient object
+				break;
+
+			case "createPattern":
+				// not implemented, since it returns a pattern object
+				break;
+
+			case "createRadialGradient":
+				// not implemented, since it returns a gradient object
+				break;
+
+			case "drawCustomFocusRing":
+				// not implemented, since I don't know what this function does or what it needs
+				break;
+
+			case "drawImage":
+				if (parameters.length == 3) {
+					PARAMS.initializeValidation(command);
+					// first parameter should be nsIDOMElement (image)
+					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.drawImage(parameters[0],parameters[1],parameters[2]);
+				}
+				else if (parameters.length == 5) {
+					PARAMS.initializeValidation(command);
+					// first parameter should be nsIDOMElement (image)
+					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.drawImage(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4]);
+				}
+				else if (parameters.length == 9) {
+					PARAMS.initializeValidation(command);
+					// first parameter should be nsIDOMElement (image)
+					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.drawImage(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5],parameters[6],parameters[7],parameters[8]);
+				}
+				break;
+
+			case "drawSystemFocusRing":
+				// not implemented, since I don't know what this function does or what it needs
+				break;
+
+			case "fill":
+				dest.fill();
+				break;
+
+			case "fillRect":
+				if (parameters.length == 4) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.fillRect(parameters[0],parameters[1],parameters[2],parameters[3]);
+				}
+				break;
+
+			case "fillText":
+				if (parameters.length == 3) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.fillText(parameters[0],parameters[1],parameters[2]);
+				}
+				else if (parameters.length == 4) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.fillText(parameters[0],parameters[1],parameters[2],parameters[3]);
+				}
+				break;
+
+			case "getImageData":
+				// not implemented, since it returns image data
+				break;
+
+			case "getLineDash":
+				// not implemented, since I don't know what this function does or what it needs
+				break;
+
+			case "isPointInPath":
+				// not implemented, since it returns a boolean
+				break;
+
+			case "isPointInStroke":
+				// not implemented, since it returns a boolean
+				break;
+
+			case "lineTo":
+				if (parameters.length == 2) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.lineTo(parameters[0],parameters[1]);
+				}
+				break;
+
+			case "measureText":
+				// not implemented, since it returns a nsIDOMTextMetrics object
+				break;
+
+			case "moveTo":
+				if (parameters.length == 2) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.moveTo(parameters[0],parameters[1]);
+				}
+				break;
+
+			case "putImageData":
+				if (parameters.length == 3) {
+					PARAMS.initializeValidation(command);
+					// first parameter should be imageData
+					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.putImageData(parameters[0],parameters[1],parameters[2]);
+				}
+				else if (parameters.length == 7) {
+					PARAMS.initializeValidation(command);
+					// first parameter should be imageData
+					PARAMS.validateArguments([PARAMS.OBJECT,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.INTEGER,PARAMS.INTEGER,PARAMS.INTEGER,PARAMS.INTEGER],
+											 parameters);
+					dest.putImageData(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5],parameters[6]);
+				}
+				break;
+
+			case "quadraticCurveTo":
+				if (parameters.length == 4) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.putImageData(parameters[0],parameters[1],parameters[2],parameters[3]);
+				}
+				break;
+
+			case "rect":
+				if (parameters.length == 4) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.rect(parameters[0],parameters[1],parameters[2],parameters[3]);
+				}
+				break;
+
+			case "restore":
+				if (restoreCount < saveCount) {
+					dest.restore();
+					restoreCount++;
+				}
+				break;
+
+			case "rotate":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER],
+											 parameters);
+					dest.rotate(parameters[0]);
+				}
+				break;
+
+			case "save":
+				dest.save();
+				saveCount++;
+				break;
+
+			case "scale":
+				if (parameters.length == 2) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.scale(parameters[0],parameters[1]);
+				}
+				break;
+
+			case "scrollPathIntoView":
+				// not implemented, since I don't know what this function does or what it needs
+				break;
+
+			// the following cases are for setting properties, rather than calling functions ******************
+			case "setFillStyle":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING],
+											 parameters);
+					dest.fillStyle = parameters[0];
+				}
+				break;
+
+			case "setFont":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING],
+											 parameters);
+					dest.font = parameters[0];
+				}
+				break;
+
+			case "setGlobalAlpha":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER],
+											 parameters);
+					dest.globalAlpha = parameters[0];
+				}
+				break;
+
+			case "setGlobalCompositeOperation":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING],
+											 parameters);
+					dest.globalCompositeOperation = parameters[0];
+				}
+				break;
+
+			case "setLineCap":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING],
+											 parameters);
+					dest.lineCap = parameters[0];
+				}
+				break;
+
+			case "setLineDashOffset":
+				// not implemented, since I don't know how to use this property
+				break;
+
+			case "setLineJoin":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING],
+											 parameters);
+					dest.lineJoin = parameters[0];
+				}
+				break;
+
+			case "setLineWidth":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER],
+											 parameters);
+					dest.lineWidth = parameters[0];
+				}
+				break;
+
+			case "setMiterLimit":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER],
+											 parameters);
+					dest.miterLimit = parameters[0];
+				}
+				break;
+
+			case "setShadowBlur":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER],
+											 parameters);
+					dest.shadowBlur = parameters[0];
+				}
+				break;
+
+			case "setShadowOffsetX":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER],
+											 parameters);
+					dest.shadowOffsetX = parameters[0];
+				}
+				break;
+
+			case "setShadowOffsetY":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER],
+											 parameters);
+					dest.shadowOffsetY = parameters[0];
+				}
+				break;
+
+			case "setStrokeStyle":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING],
+											 parameters);
+					dest.strokeStyle = parameters[0];
+				}
+				break;
+
+			case "setTextAlign":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING],
+											 parameters);
+					dest.textAlign = parameters[0];
+				}
+				break;
+
+			case "setTextBaseline":
+				if (parameters.length == 1) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING],
+											 parameters);
+					dest.textBaseline = parameters[0];
+				}
+				break;
+
+			// this ends the properties cases of this function *************************************
+
+			case "setLineDash":
+				// not implemented, since I don't know what this function does or what it needs
+				break;
+
+			case "setTransform":
+				if (parameters.length == 6) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.setTransform(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5]);
+				}
+				break;
+
+			case "stroke":
+				dest.stroke();
+				break;
+
+			case "strokeRect":
+				if (parameters.length == 4) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.strokeRect(parameters[0],parameters[1],parameters[2],parameters[3]);
+				}
+				break;
+
+			case "strokeText":
+				if (parameters.length == 3) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.strokeText(parameters[0],parameters[1],parameters[2]);
+				}
+				else if (parameters.length == 4) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.STRING,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.strokeText(parameters[0],parameters[1],parameters[2],parameters[3]);
+				}
+				break;
+
+			case "transform":
+				if (parameters.length == 6) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.transform(parameters[0],parameters[1],parameters[2],parameters[3],parameters[4],parameters[5]);
+				}
+				break;
+
+			case "translate":
+				if (parameters.length == 2) {
+					PARAMS.initializeValidation(command);
+					PARAMS.validateArguments([PARAMS.NUMBER,PARAMS.NUMBER],
+											 parameters);
+					dest.translate(parameters[0],parameters[1]);
+				}
+				break;
+
+		}
+	}
+
+	if (saveCount > restoreCount) {
+		for (var i = 0; i < saveCount - restoreCount; i++) {
+			dest.restore();
+		}
+	}
 }
 // Public Constructor function
 // Input parameter(s):  Block capable of being shattered, integer, integer, integer, integer, integer
@@ -5563,11 +6087,7 @@ FragmentBlock.prototype.undraw = function(dest) {
 		
 		try {
 			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) > 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+				var zratio = this.getZRatio();
 
 				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -5627,11 +6147,7 @@ FragmentBlock.prototype.draw = function(dest) {
 		
 		try {
 			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) != 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+				var zratio = this.getZRatio();
 
 				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -5790,46 +6306,6 @@ FragmentBlock.prototype.destroy = function() {
 
 	ActorBlock.prototype.destroy.call(this);
 }
-var PlayerBlock = function() {
-	LOG.write("PlayerBlock constructor called", LOG.VERBOSE);
-	ActorBlock.call(this);
-}
-
-PlayerBlock.prototype = new ActorBlock();
-
-PlayerBlock.prototype.play = function() {
-
-}
-
-PlayerBlock.prototype.pause = function() {
-
-}
-
-PlayerBlock.prototype.unpause = function() {
-
-}
-
-PlayerBlock.prototype.playPause = function() {
-
-}
-
-PlayerBlock.prototype.stop = function() {
-
-}
-
-PlayerBlock.prototype.getVolume = function() {
-
-}
-
-PlayerBlock.prototype.setVolume = function() {
-
-}
-
-PlayerBlock.prototype.destroy = function() {
-	ActorBlock.prototype.destroy.call(this);
-}
-
-
 // Public Constructor function
 // Input parameter(s):  track alias string
 // Returns: SoundBlock object instantiated with the AudioTrack matching the supplied input parameter
@@ -5839,12 +6315,13 @@ var SoundBlock = function(trackAlias) {
 	trackAlias = PARAMS.validateParam(PARAMS.STRING, trackAlias);
 
 	LOG.write("SoundBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	this.track = CANVASMANAGER.getAudioAsset(trackAlias);
 }
 
-SoundBlock.prototype = new PlayerBlock();
+SoundBlock.prototype = new ActorBlock();
+SoundBlock.prototype.learn(PlayerTraits);
 
 // Public function
 // Input parameter(s): none
@@ -5925,7 +6402,7 @@ var StereoBlock = function() {
 	PARAMS.validateArguments([PARAMS.REST, PARAMS.STRING], arguments);
 
 	LOG.write("SoundBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	this.tracks = new Array();
 
@@ -5941,7 +6418,8 @@ var StereoBlock = function() {
 	this.looping = false;
 }
 
-StereoBlock.prototype = new PlayerBlock();
+StereoBlock.prototype = new ActorBlock();
+StereoBlock.prototype.learn(PlayerTraits);
 
 // Private function
 // Input parameters: none
@@ -6110,7 +6588,7 @@ var MovieBlock = function() {
 	PARAMS.validateArguments([PARAMS.REST, PARAMS.STRING], arguments);
 
 	LOG.write("MovieBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	this.frameAliases = new Array();
 
@@ -6118,16 +6596,6 @@ var MovieBlock = function() {
 		this.frameAliases[i] = arguments[i];
 	}
 
-	//var imgDataArrayCopy = new Array();
-
-	//for (var i = 0; i < imgDataArray.length; i++) {
-	//	var copy = CANVASMANAGER.workingCanvasFrame.context.createImageData(imgDataArray[i].width, imgDataArray[i].height);
-	//	copy.data.set(imgDataArray[i].data);
-	//	imgDataArrayCopy[i] = copy;
-	//}
-
-	//this.originalImageDataArray = imgDataArray;
-	this.frameData = new Array();
 	this.frames = new Array();
 
 	this.filters = new Array();
@@ -6141,16 +6609,11 @@ var MovieBlock = function() {
 	this.currentFrameIndex = -1;
 
 	this.maskMode = "none";
-
-	var shattered = false;
-
-	this._getShattered = function() { return shattered; };
-	this._setShattered = function(val) { shattered = val; };
-
-	this.shattered = shattered;
 }
 
-MovieBlock.prototype = new PlayerBlock();
+MovieBlock.prototype = new ActorBlock();
+MovieBlock.prototype.learn(PlayerTraits);
+MovieBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -6190,63 +6653,6 @@ MovieBlock.prototype.hasChangedFromLatestMemory = function() {
 	}
 }
 
-// // Private function
-// // Input parameters: none
-// // Returns: nothing
-// // Description: function for internal use, populates the frameData property with imgData from this object's image aliases
-// MovieBlock.prototype.createFrameData = function() {
-// 	var imgDataArray = CANVASMANAGER.getImageAssetData(this.frameAliases);
-// 	var imgDataArrayCopy = new Array();
-
-// 	for (var i = 0; i < imgDataArray.length; i++) {
-// 		var copy = CANVASMANAGER.workingCanvasFrame.context.createImageData(imgDataArray[i].width, imgDataArray[i].height);
-// 		copy.data.set(imgDataArray[i].data);
-// 		imgDataArrayCopy[i] = copy;
-// 	}
-
-// 	this.frameData = imgDataArrayCopy;
-// }
-
-// // Public function
-// // Input parameters: an array of imgData objects
-// // Returns: nothing
-// // Description: function for external use, populates the frameData property with the input parameter
-// // currently only used to populate imgData for child blocks when shattering a block object
-// MovieBlock.prototype.setFrameData = function(imgDataArray) {
-// 	this.frameData = imgDataArray;
-// }
-
-// // Public function
-// // Input parameters: none
-// // Returns: nothing
-// // Description: function for external use, 
-// // transforms the imgData from the frameData property of the object into images for the frames property
-// // currently only used to update child blocks when shattering a block object
-// MovieBlock.prototype.updateFrames = function() {
-// 	//this.frames.splice(0,this.frames.length);
-// 	for (var i = 0; i < this.frameData.length; i++) {
-// 		CANVASMANAGER.workingCanvasFrame.resize(this.frameData[i].width,this.frameData[i].height,-1);
-// 		CANVASMANAGER.workingCanvasFrame.context.clearRect(0,0,this.frameData[i].width,this.frameData[i].height);
-// 		CANVASMANAGER.workingCanvasFrame.context.putImageData(this.frameData[i],0,0);
-// 		//var workingImage = new Image();
-// 		//workingImage.src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
-// 		//this.frames[i] = workingImage;
-// 		if (this.frames[i] == null) {
-// 			this.frames[i] = new Image();
-// 		}
-// 		this.frames[i].src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
-// 	}
-// }
-
-// MovieBlock.prototype.getFrameAliasesFromShatteredParent = function() {
-// 	if (this.shatteredParent != null) {
-// 		return this.shatteredParent.getFrameAliasesFromShatteredParent();
-// 	}
-// 	else {
-// 		return this.frameAliases;
-// 	}
-// }
-
 // Public function
 // Input parameters: the new size for the shattered blocks (integer)
 // Returns: nothing
@@ -6255,75 +6661,20 @@ MovieBlock.prototype.hasChangedFromLatestMemory = function() {
 MovieBlock.prototype.shatter = function(newBlockSize) {
 	PARAMS.initializeValidation(); 
 	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
-	
-	if (!this.shattered) {
-		var blockClusterPositions = new Array();
-		var maxWidth = 0;
-		var maxHeight = 0;
 
-		var length = this.frameAliases.length;
+	var maxWidth = 0;
+	var maxHeight = 0;
 
-		for (var k = 0; k < length; k++) {
-			// if (this.shatteredParent != null) {
-			// 	maxWidth = this.width;
-			// 	maxHeight = this.height;
-			// }
-			// else {
-				var frame = this.getFrame(k);
+	var length = this.frameAliases.length;
 
-				if (frame.width > maxWidth) { maxWidth = frame.width; }
-				if (frame.height > maxHeight) { maxHeight = frame.height; }
-			// }
-		}
+	for (var k = 0; k < length; k++) {
+		var frame = this.getFrame(k);
 
-		var blockIndex = 0;
-		for (var i = 0; i < maxWidth; i += newBlockSize) {
-			for (var j = 0; j < maxHeight; j += newBlockSize) {
-				if (blockClusterPositions[blockIndex] == undefined) {
-					blockClusterPositions[blockIndex] = {"x":Math.floor(i - maxWidth/2 + newBlockSize/2), "y":Math.floor(j - maxHeight/2 + newBlockSize/2)};
-				}
-				
-				blockIndex++;
-			}
-		}
-
-		for (var i = 0; i < blockClusterPositions.length; i++) {
-			var newBlock = new FragmentBlock(this, newBlockSize,newBlockSize,blockClusterPositions[i].x,blockClusterPositions[i].y,0);
-			//newBlock.shatteredParent = this;
-
-			newBlock.setMemoryCapacity(this.memoryCapacity);
-
-			//newBlock.x = blockClusterPositions[i].x;
-			//newBlock.y = blockClusterPositions[i].y;
-			//newBlock.z = 0;
-
-			//newBlock.homeX = blockClusterPositions[i].x;
-			//newBlock.homeY = blockClusterPositions[i].y;
-			//newBlock.homeZ = 0;
-
-			//newBlock.width = newBlockSize;
-			//newBlock.height = newBlockSize;
-			
-			this.adoptChild(newBlock);
-		}
-
-		this.shattered = true;
+		if (frame.width > maxWidth) { maxWidth = frame.width; }
+		if (frame.height > maxHeight) { maxHeight = frame.height; }
 	}
-}
 
-// Public function
-// Input parameters: none
-// Returns: nothing
-// Description: removes child blocks resulting from shatter
-MovieBlock.prototype.unshatter = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i] instanceof FragmentBlock) {
-			this.children[i].destroy();
-			this.children.splice(i,1);
-			i--;
-		}
-	}
-	this.shattered = false;
+	ShatterTraits.prototype.shatter.call(this, newBlockSize, maxWidth, maxHeight);
 }
 
 // Public function
@@ -6346,15 +6697,6 @@ MovieBlock.prototype.getCurrentFrame = function() {
 		return null;
 	}
 }
-
-// MovieBlock.prototype.getCurrentFrameFromShatteredParent = function() {
-// 	if (this.shatteredParent != null) {
-// 		return this.shatteredParent.getCurrentFrameFromShatteredParent();
-// 	}
-// 	else {
-// 		return this.getCurrentFrame();
-// 	}
-// }
 
 // Public function
 // Input parameters: integer index of the desired frame
@@ -6379,15 +6721,6 @@ MovieBlock.prototype.getFrame = function(frameIndex) {
 		return null;
 	}
 }
-
-// MovieBlock.prototype.getFrameFromShatteredParent = function(frameIndex) {
-// 	if (this.shatteredParent != null) {
-// 		return this.shatteredParent.getFrameFromShatteredParent(frameIndex);
-// 	}
-// 	else {
-// 		return this.getFrame(frameIndex);
-// 	}
-// }
 
 MovieBlock.prototype.play = function() {
 	this.isPlaying = true;
@@ -6420,51 +6753,37 @@ MovieBlock.prototype.undraw = function(dest) {
 	PARAMS.initializeValidation();
 	dest = PARAMS.validateParam(PARAMS.CANVAS2DCONTEXT, dest);
 
-	if (this.frameAliases.length > 0 || this.frames.length > 0) {
-		var drawx = 0;
-		var drawy = 0;
-		
-		try {
-			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) > 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+	var drawx = 0;
+	var drawy = 0;
+	
+	try {
+		if (this._getVisible()) {
+			var zratio = this.getZRatio();
 
-				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
-				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
+			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
+			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
 
-				dest.save();
-				dest.translate(drawx + this._getWidth()/2,drawy+this._getHeight()/2);
-				dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
-				dest.rotate(this._getRotation()*Math.PI/180);
+			dest.save();
+			dest.translate(drawx + this._getWidth()/2,drawy+this._getHeight()/2);
+			dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
+			dest.rotate(this._getRotation()*Math.PI/180);
 
-				// if (!this.shattered) {
-				// 	dest.clearRect(-this.width/2 - 1, -this.height/2 - 1, this.width + 2, this.height + 2);
-				// }
-
-				// if (this.shatteredParent != null && !this.shattered && this.homeX != undefined && this.homeY != undefined) {
-				// 	dest.clearRect(-this.width/2 - 1,-this.height/2 - 1,this.width + 2,this.height + 2);
-				// }
-				// else 
-				if (!this._getShattered()) {
-					dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
-				}
-
-				for (var i = 0; i < this.children.length; i++) {
-					this.children[i].undraw(dest);
-				}
-
-				dest.restore();
+			if (!this._getShattered()) {
+				dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
 			}
+
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].undraw(dest);
+			}
+
+			dest.restore();
 		}
-		catch (err) {
-			LOG.write("error in MovieBlock.undraw at: " + drawx + " " + drawy, LOG.ERROR);
-			LOG.writeBlock(this, LOG.ERROR);
-			LOG.writeObject(err, LOG.ERROR);
-			debugger;
-		}
+	}
+	catch (err) {
+		LOG.write("error in MovieBlock.undraw at: " + drawx + " " + drawy, LOG.ERROR);
+		LOG.writeBlock(this, LOG.ERROR);
+		LOG.writeObject(err, LOG.ERROR);
+		debugger;
 	}
 }
 
@@ -6474,33 +6793,13 @@ MovieBlock.prototype.undraw = function(dest) {
 // Description: overrides ActorBlock.update,
 // handles frame updates and filter/mask application
 MovieBlock.prototype.update = function() {
-	// if (this.isPlaying) {
-	// 	this.currentFrameIndex++;
-
-	// 	if ((this.frameAliases.length > 0 && this.currentFrameIndex >= this.frameAliases.length) ||
-	// 		 (this.frameData.length > 0 && this.currentFrameIndex >= this.frameData.length)) {
-	// 		 this.currentFrameIndex = 0;
-	// 	}
-	// }
-
-	// if (this.currentFrameIndex < 0) {
-	// 	this.currentFrameIndex = 0;
-	// }
-
-	// var currentFrame = this.getCurrentFrame();
-
-	// if (currentFrame != null) {
-	// 	this.width = currentFrame.width;
-	// 	this.height = currentFrame.height;
-	// }
-
 	ActorBlock.prototype.update.call(this);
 
 	if (this.isPlaying) {
 		this.currentFrameIndex++;
 
 		if ((this.frameAliases.length > 0 && this.currentFrameIndex >= this.frameAliases.length) ||
-			 (this.frameData.length > 0 && this.currentFrameIndex >= this.frameData.length)) {
+			 (this.frames.length > 0 && this.currentFrameIndex >= this.frames.length)) {
 			 this.currentFrameIndex = 0;
 		}
 	}
@@ -6521,14 +6820,6 @@ MovieBlock.prototype.update = function() {
 
 	this._setShattered(this.shattered);
 
-	// was there a reason this was under the superclass update?
-	// var currentFrame = this.getCurrentFrame();
-
-	// if (currentFrame != null) {
-	// 	this.width = currentFrame.width;
-	// 	this.height = currentFrame.height;
-	// }
-
 	this.applyFiltersAndMasks();
 }
 
@@ -6541,129 +6832,72 @@ MovieBlock.prototype.draw = function(dest) {
 	PARAMS.initializeValidation();
 	dest = PARAMS.validateParam(PARAMS.CANVAS2DCONTEXT, dest);
 
-	if (this.frameAliases.length > 0 || this.frames.length > 0) {
-		var drawx = 0;
-		var drawy = 0;
-		
-		try {
-			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) != 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+	var drawx = 0;
+	var drawy = 0;
+	
+	try {
+		if (this._getVisible()) {
+			var zratio = this.getZRatio();
 
-				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
-				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
+			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
+			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
 
+			dest.save();
+			dest.translate(drawx + this._getWidth()/2,drawy+this._getHeight()/2);
+			dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
+			dest.rotate(this._getRotation()*Math.PI/180);
+
+			switch(this.maskMode) {
+				case "window":
+					dest.globalCompositeOperation = "destination-in";
+				break;
+
+				case "wall":
+					dest.globalCompositeOperation = "destination-out";
+				break;
+			}
+			
+			if (!this._getShattered()) {
+				var currentFrame = this.getCurrentFrame();
+				if (currentFrame != null) {	
+					dest.drawImage(currentFrame,-this._getWidth()/2,-this._getHeight()/2);
+				}
+			}
+			 
+
+			if (this.showDebugDisplay) {
 				dest.save();
-				dest.translate(drawx + this._getWidth()/2,drawy+this._getHeight()/2);
-				dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
-				dest.rotate(this._getRotation()*Math.PI/180);
-
-				switch(this.maskMode) {
-					case "window":
-						dest.globalCompositeOperation = "destination-in";
-					break;
-
-					case "wall":
-						dest.globalCompositeOperation = "destination-out";
-					break;
-				}
-				
-
-				// if (this.shatteredParent != null && !this.shattered && this.homeX != undefined && this.homeY != undefined) {
-				// 	var currentFrame = this.shatteredParent.getCurrentFrameFromShatteredParent();
-				// 	if (currentFrame != null) {
-				// 		dest.drawImage(currentFrame,this.getWidthInShatteredParent()-this.width/2,this.getHeightInShatteredParent()-this.height/2,this.width,this.height,
-				// 									-this.width/2,-this.height/2,this.width,this.height);
-				// 	}
-				// }
-				// else 
-				if (!this._getShattered()) {
-					var currentFrame = this.getCurrentFrame();
-					if (currentFrame != null) {	
-						dest.drawImage(currentFrame,-this._getWidth()/2,-this._getHeight()/2);
-					}
-				}
-				 
-
-				if (this.showDebugDisplay) {
-					dest.save();
-					dest.strokeStyle = "Green";
-					dest.lineWidth = 1;
-					dest.beginPath();
-					dest.moveTo(0,0);
-					dest.lineTo(0,-this._getHeight()/2);
-					dest.stroke();
-					dest.fillStyle = "Red";
-					dest.fillRect(-4,-4,8,8);
-					dest.beginPath();
-					dest.strokeStyle = "Blue";
-					dest.lineWidth = 1;
-					dest.rect(-this._getWidth()/2,-this._getHeight()/2,this._getWidth(),this._getHeight());
-					dest.stroke();
-					dest.restore();
-				}
-
-				this.children.sort(function(a,b) { return b.z - a.z });
-				for (var i = 0; i < this.children.length; i++) {
-					this.children[i].draw(dest);
-				}
-				
+				dest.strokeStyle = "Green";
+				dest.lineWidth = 1;
+				dest.beginPath();
+				dest.moveTo(0,0);
+				dest.lineTo(0,-this._getHeight()/2);
+				dest.stroke();
+				dest.fillStyle = "Red";
+				dest.fillRect(-4,-4,8,8);
+				dest.beginPath();
+				dest.strokeStyle = "Blue";
+				dest.lineWidth = 1;
+				dest.rect(-this._getWidth()/2,-this._getHeight()/2,this._getWidth(),this._getHeight());
+				dest.stroke();
 				dest.restore();
 			}
-		}
-		catch (err) {
-			LOG.write("error in MovieBlock.draw at: " + drawx + " " + drawy, LOG.ERROR);
-			LOG.writeBlock(this, LOG.ERROR);
-			LOG.writeObject(err, LOG.ERROR);
-			debugger;
+
+			this.children.sort(function(a,b) { return b.z - a.z });
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].draw(dest);
+			}
+			
+			dest.restore();
 		}
 	}
+	catch (err) {
+		LOG.write("error in MovieBlock.draw at: " + drawx + " " + drawy, LOG.ERROR);
+		LOG.writeBlock(this, LOG.ERROR);
+		LOG.writeObject(err, LOG.ERROR);
+		debugger;
+	}
 }
-
-// MovieBlock.prototype.getWidthInShatteredParent = function() {
-// 	if (this.shatteredParent != null) {
-// 		// if (this.homeX == undefined) {
-// 		// 	return this.parent.getWidthInShatteredParent() - this.width/2;
-// 		// }
-// 		// else {
-// 		// 	return this.parent.getWidthInShatteredParent() + this.homeX - this.width/2;
-// 		// }
-// 		return this.shatteredParent.getWidthInShatteredParent() + this.homeX  ;
-// 	}
-// 	else {
-// 		// if (this.homeX == undefined) {
-// 		// 	return -this.width/2;
-// 		// }
-// 		// else {
-// 		// 	return this.homeX - this.width/2;
-// 		// }
-// 		return this.width/2;
-// 	}
-// }
-
-// MovieBlock.prototype.getHeightInShatteredParent = function() {
-// 	if (this.shatteredParent != null) {
-// 		// if (this.homeY == undefined) {
-// 		// 	return this.parent.getHeightInShatteredParent() - this.height/2;
-// 		// }
-// 		// else {
-// 		// 	return this.parent.getHeightInShatteredParent() + this.homeY - this.height/2;
-// 		// }
-// 		return this.shatteredParent.getHeightInShatteredParent() + this.homeY;
-// 	}
-// 	else {
-// 		// if (this.homeY == undefined) {
-// 		// 	return -this.height/2;
-// 		// }
-// 		// else {
-// 		// 	return this.homeY - this.height/2;
-// 		// }
-// 		return this.height/2;
-// 	}
-// }
 
 // Public function
 // Input parameters: red value (0-255), green value (0-255), blue value (0-255), alpha value (0.0-1.0)
@@ -6979,9 +7213,6 @@ MovieBlock.prototype.destroy = function() {
 		this.frameAliases.length = 0;
 		this.frameAliases = undefined;
 
-		this.frameData.length = 0;
-		this.frameData = undefined;
-
 		this.frames.length = 0;
 		this.frames = undefined;
 
@@ -7017,7 +7248,7 @@ var CinemaBlock = function() {
 	PARAMS.validateArguments([PARAMS.REST, PARAMS.STRING, PARAMS.ARRAYOFSTRING], arguments);
 
 	LOG.write("CinemaBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	this.movieFrameAliases = new Object();
 
@@ -7047,16 +7278,11 @@ var CinemaBlock = function() {
 	this.currentFrameIndex = -1;
 
 	this.maskMode = "none";
-
-	var shattered = false;
-
-	this._getShattered = function() { return shattered; };
-	this._setShattered = function(val) { shattered = val; };
-
-	this.shattered = shattered;
 }
 
-CinemaBlock.prototype = new PlayerBlock();
+CinemaBlock.prototype = new ActorBlock();
+CinemaBlock.prototype.learn(PlayerTraits);
+CinemaBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -7146,61 +7372,6 @@ CinemaBlock.prototype.stop = function() {
 	this.pause();
 }
 
-// // Private function
-// // Input parameters: none
-// // Returns: nothing
-// // Description: function for internal use, populates the frameData property with imgData from this object's image aliases
-// CinemaBlock.prototype.createFrameData = function() {
-// 	for (var movieName in this.movieFrameAliases) {
-// 		var imgDataArray = CANVASMANAGER.getImageAssetData(this.movieFrameAliases[movieName]);
-// 		var imgDataArrayCopy = new Array();
-
-// 		for (var i = 0; i < imgDataArray.length; i++) {
-// 			var copy = CANVASMANAGER.workingCanvasFrame.context.createImageData(imgDataArray[i].width, imgDataArray[i].height);
-// 			copy.data.set(imgDataArray[i].data);
-// 			imgDataArrayCopy[i] = copy;
-// 		}
-
-// 		this.movieFrameData[movieName] = imgDataArrayCopy;
-// 	}
-// }
-
-// // Public function
-// // Input parameters: movieName string, an array of imgData objects
-// // Returns: nothing
-// // Description: function for external use, populates the frameData property with the input parameter for the specified movie
-// // currently only used to populate imgData for child blocks when shattering a block object
-// CinemaBlock.prototype.setFrameData = function(movieName, imgDataArray) {
-// 	this.movieFrameData[movieName] = imgDataArray;
-// 	if (this.currentMovie == "") {
-// 		this.currentMovie = movieName;
-// 	}
-// }
-
-// // Public function
-// // Input parameters: none
-// // Returns: nothing
-// // Description: function for external use, 
-// // transforms the imgData from the frameData property of the object into images for the frames property
-// // currently only used to update child blocks when shattering a block object
-// CinemaBlock.prototype.updateFrames = function() {
-// 	//this.frames.splice(0,this.frames.length);
-// 	for (var movieName in this.movieFrameData) {
-// 		for (var i = 0; i < this.movieFrameData[movieName].length; i++) {
-// 			CANVASMANAGER.workingCanvasFrame.resize(this.movieFrameData[movieName][i].width,this.movieFrameData[movieName][i].height,-1);
-// 			CANVASMANAGER.workingCanvasFrame.context.clearRect(0,0,this.movieFrameData[movieName][i].width,this.movieFrameData[movieName][i].height);
-// 			CANVASMANAGER.workingCanvasFrame.context.putImageData(this.movieFrameData[movieName][i],0,0);
-// 			//var workingImage = new Image();
-// 			//workingImage.src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
-// 			//this.frames[i] = workingImage;
-// 			if (this.movieFrames[movieName][i] == null) {
-// 				this.movieFrames[movieName][i] = new Image();
-// 			}
-// 			this.movieFrames[movieName][i].src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
-// 		}
-// 	}
-// }
-
 // Public function
 // Input parameters: the new size for the shattered blocks (integer)
 // Returns: nothing
@@ -7210,56 +7381,19 @@ CinemaBlock.prototype.shatter = function(newBlockSize) {
 	PARAMS.initializeValidation();
 	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
 
-	if (!this.shattered) {
-		var blockClusterPositions = new Array();
-		var maxWidth = 0;
-		var maxHeight = 0;
+	var maxWidth = 0;
+	var maxHeight = 0;
 
-		for (var movieName in this.movieFrameAliases) {
-			for (var k = 0; k < this.movieFrameAliases[movieName].length; k++) {
-				var frame = this.getFrame(movieName,k);
+	for (var movieName in this.movieFrameAliases) {
+		for (var k = 0; k < this.movieFrameAliases[movieName].length; k++) {
+			var frame = this.getFrame(movieName,k);
 
-				if (frame.width > maxWidth) { maxWidth = frame.width; }
-				if (frame.height > maxHeight) { maxHeight = frame.height; }
-			}
-		}
-
-		var blockIndex = 0;
-		for (var i = 0; i < maxWidth; i += newBlockSize) {
-			for (var j = 0; j < maxHeight; j += newBlockSize) {
-				if (blockClusterPositions[blockIndex] == undefined) {
-					blockClusterPositions[blockIndex] = {"x":Math.floor(i - maxWidth/2 + newBlockSize/2), "y":Math.floor(j - maxHeight/2 + newBlockSize/2)};
-				}
-				
-				blockIndex++;
-			}
-		}
-
-		for (var i = 0; i < blockClusterPositions.length; i++) {
-			var newBlock = new FragmentBlock(this, newBlockSize, newBlockSize, blockClusterPositions[i].x, blockClusterPositions[i].y, 0);
-			
-			newBlock.setMemoryCapacity(this.memoryCapacity);
-			
-			this.adoptChild(newBlock);
-		}
-
-		this.shattered = true;
-	}
-}
-
-// Public function
-// Input parameters: none
-// Returns: nothing
-// Description: removes child blocks resulting from shatter
-CinemaBlock.prototype.unshatter = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i] instanceof FragmentBlock) {
-			this.children[i].destroy();
-			this.children.splice(i,1);
-			i--;
+			if (frame.width > maxWidth) { maxWidth = frame.width; }
+			if (frame.height > maxHeight) { maxHeight = frame.height; }
 		}
 	}
-	this.shattered = false;
+
+	ShatterTraits.prototype.shatter.call(this,newBlockSize,maxWidth,maxHeight);
 }
 
 // Public function
@@ -7343,11 +7477,7 @@ CinemaBlock.prototype.undraw = function(dest) {
 		
 		try {
 			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) > 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+				var zratio = this.getZRatio();
 
 				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -7357,12 +7487,6 @@ CinemaBlock.prototype.undraw = function(dest) {
 				dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
 				dest.rotate(this._getRotation()*Math.PI/180);
 
-				//dest.clearRect(-this.width/2 - 1, -this.height/2 - 1, this.width + 2, this.height + 2);
-
-				// if (this.parent.shattered && this.homeX != undefined && this.homeY != undefined) {
-				// 	dest.clearRect(-this.width/2 - 1,-this.height/2 - 1,this.width + 2,this.height + 2);
-				// }
-				// else 
 				if (!this._getShattered()) {
 					dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
 				}
@@ -7389,26 +7513,6 @@ CinemaBlock.prototype.undraw = function(dest) {
 // Description: overrides ActorBlock.update,
 // handles frame updates and filter/mask application
 CinemaBlock.prototype.update = function() {
-	// if (this.isPlaying) {
-	// 	this.currentFrameIndex++;
-
-	// 	if ((this.movieFrameAliases[this.currentMovie] != null && this.movieFrameAliases[this.currentMovie].length > 0 && this.currentFrameIndex >= this.movieFrameAliases[this.currentMovie].length) ||
-	// 		 (this.movieFrameData[this.currentMovie] != null && this.movieFrameData[this.currentMovie].length > 0 && this.currentFrameIndex >= this.movieFrameData[this.currentMovie].length)) {
-	// 		 this.currentFrameIndex = 0;
-	// 	}
-	// }
-
-	// if (this.currentFrameIndex < 0) {
-	// 	this.currentFrameIndex = 0;
-	// }
-
-	// var currentFrame = this.getCurrentFrame();
-
-	// if (currentFrame != null) {
-	// 	this.width = currentFrame.width;
-	// 	this.height = currentFrame.height;
-	// }
-
 	ActorBlock.prototype.update.call(this);
 
 	if (this.isPlaying) {
@@ -7436,14 +7540,6 @@ CinemaBlock.prototype.update = function() {
 
 	this._setShattered(this.shattered);
 
-	// was this after the superclass update for a reason?
-	// var currentFrame = this.getCurrentFrame();
-
-	// if (currentFrame != null) {
-	// 	this.width = currentFrame.width;
-	// 	this.height = currentFrame.height;
-	// }
-
 	this.applyFiltersAndMasks();
 }
 
@@ -7462,11 +7558,7 @@ CinemaBlock.prototype.draw = function(dest) {
 		
 		try {
 			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) > 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+				var zratio = this.getZRatio();
 
 				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -7486,19 +7578,6 @@ CinemaBlock.prototype.draw = function(dest) {
 					break;
 				}
 				
-				// var currentFrame = this.getCurrentFrame();
-				// if (currentFrame != null) {	
-				// 	dest.drawImage(currentFrame,-this.width/2,-this.height/2);
-				// }
-
-				// if (this.parent.shattered && this.homeX != undefined && this.homeY != undefined) {
-				// 	var currentFrame = this.parent.getCurrentFrame();
-				// 	if (currentFrame != null) {
-				// 		dest.drawImage(currentFrame,this.homeX+this.parent.width/2-this.width/2,this.homeY+this.parent.height/2-this.height/2,this.width,this.height,
-				// 									-this.width/2,-this.height/2,this.width,this.height);
-				// 	}
-				// }
-				// else 
 				if (!this._getShattered()) {
 					var currentFrame = this.getCurrentFrame();
 					if (currentFrame != null) {	
@@ -8210,7 +8289,6 @@ CinemaBlock.prototype.destroy = function() {
 	this.movieFiltersUpdate = undefined;
 	this.movieMasksUpdate = undefined;
 
-
 	this.isPlaying = undefined;
 	this.currentMovie = undefined;
 	
@@ -8451,12 +8529,7 @@ TextBlock.prototype.undraw = function(dest) {
 					break;
 			}
 
-
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2)
-			var zratio = 1
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-originX + zratio*this._getX());
 			drawy = Math.round(-originY + zratio*this._getY());				
@@ -8493,22 +8566,6 @@ TextBlock.prototype.undraw = function(dest) {
 // Description: overrides ActorBlock.update,
 // handles text and font updates
 TextBlock.prototype.update = function() {
-	// if (this.hasChangedFromLatestMemory(true)) {
-	// 	CANVASMANAGER.workingCanvasFrame.context.save();
-	// 	CANVASMANAGER.workingCanvasFrame.context.font = this.size + "px " + this.font;
-	// 	CANVASMANAGER.workingCanvasFrame.context.fillStyle = this.color;
-	// 	CANVASMANAGER.workingCanvasFrame.context.fillText(this.text, 0, 0);
-	// 	this.width = CANVASMANAGER.workingCanvasFrame.context.measureText(this.text).width;
-	// 	CANVASMANAGER.workingCanvasFrame.context.restore();
-
-	// 	var metric = TEXTHELPER.measureTextHeight(this.text,this.font,this.size);
-	// 	this.height = metric.height;
-	// 	this.ascent = metric.ascent;
-	// 	this.descent = metric.descent;
-	// }
-
-	// this.lastAlignment = this.alignment;
-
 	ActorBlock.prototype.update.call(this);
 
 	this._setText(this.text);
@@ -8530,22 +8587,6 @@ TextBlock.prototype.update = function() {
 		this.ascent = metric.ascent;
 		this.descent = metric.descent;
 	}
-
-	
-
-	// if (this.hasChangedFromLatestMemory(true)) {
-	// 	CANVASMANAGER.workingCanvasFrame.context.save();
-	// 	CANVASMANAGER.workingCanvasFrame.context.font = this._getSize() + "px " + this._getFont();
-	// 	CANVASMANAGER.workingCanvasFrame.context.fillStyle = this._getColor();
-	// 	CANVASMANAGER.workingCanvasFrame.context.fillText(this._getText(), 0, 0);
-	// 	this.width = CANVASMANAGER.workingCanvasFrame.context.measureText(this._getText()).width;
-	// 	CANVASMANAGER.workingCanvasFrame.context.restore();
-
-	// 	var metric = TEXTHELPER.measureTextHeight(this._getText(),this._getFont(),this._getSize());
-	// 	this.height = metric.height;
-	// 	this.ascent = metric.ascent;
-	// 	this.descent = metric.descent;
-	// }
 
 	if (this.width == 0) { this.width = 1; }
 	if (this.height ==0) { this.height = 1; }
@@ -8587,12 +8628,7 @@ TextBlock.prototype.draw = function(dest) {
 					break;
 			}
 
-
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-originX + zratio*this._getX());
 			drawy = Math.round(-originY + zratio*this._getY());
@@ -8699,14 +8735,12 @@ var ImageTextBlock = function(textParam, fontParam, sizeParam, colorParam, align
 	var size = 0;
 	var color = 0;
 	var alignment = "";
-	var shattered = false;
 
 	this._getText = function() { return text; };
 	this._getFont = function() { return font; };
 	this._getSize = function() { return size; };
 	this._getColor = function() { return color; };
 	this._getAlignment = function() { return alignment; };
-	this._getShattered = function() { return shattered; };
 
 	this._setText = function(val) { text = val; };
 	this._setFont = function(val) { font = val; };
@@ -8720,7 +8754,6 @@ var ImageTextBlock = function(textParam, fontParam, sizeParam, colorParam, align
 				alignment = val;
 		}
 	};
-	this._setShattered = function(val) { shattered = val; };
 
 	this.text = textParam;
 	this.font = fontParam;
@@ -8742,11 +8775,10 @@ var ImageTextBlock = function(textParam, fontParam, sizeParam, colorParam, align
 	this.maskMode = "none";
 
 	this.createTextData();
-
-	this.shattered = false;
 }
 
 ImageTextBlock.prototype = new ActorBlock();
+ImageTextBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -8800,57 +8832,6 @@ ImageTextBlock.prototype.hasChangedFromLatestMemory = function(excludeParentProp
 	}
 }
 
-// Public function
-// Input parameters: the new size for the shattered blocks (integer)
-// Returns: nothing
-// Description: shatters the current block's frames into an an array of new child blocks, 
-// each with a small part of the original image/animation
-ImageTextBlock.prototype.shatter = function(newBlockSize) {
-	PARAMS.initializeValidation();
-	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
-	
-	if (!this.shattered) {
-		var blockClusterPositions = new Array();
-
-		var blockIndex = 0;
-		for (var i = 0; i < this.width; i += newBlockSize) {
-			for (var j = 0; j < this.height; j += newBlockSize) {
-				if (blockClusterPositions[blockIndex] == undefined) {
-					blockClusterPositions[blockIndex] = {"x":Math.floor(i - this.width/2 + newBlockSize/2), "y":Math.floor(j - this.height/2 + newBlockSize/2)};
-				}
-				
-				blockIndex++;
-			}
-		}
-
-		for (var i = 0; i < blockClusterPositions.length; i++) {
-			var newBlock = new FragmentBlock(this, newBlockSize, newBlockSize, blockClusterPositions[i].x, blockClusterPositions[i].y, 0);
-			//newBlock.shatteredParent = this;
-
-			newBlock.setMemoryCapacity(this.memoryCapacity);
-			
-			this.adoptChild(newBlock);
-		}
-
-		this.shattered = true;
-	}
-}
-
-// Public function
-// Input parameters: none
-// Returns: nothing
-// Description: removes child blocks resulting from shatter
-ImageTextBlock.prototype.unshatter = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i] instanceof FragmentBlock) {
-			this.children[i].destroy();
-			this.children.splice(i,1);
-			i--;
-		}
-	}
-	this.shattered = false;
-}
-
 // Private function
 // Input parameters: none
 // Returns: nothing
@@ -8902,7 +8883,6 @@ ImageTextBlock.prototype.createTextData = function() {
 	CANVASMANAGER.workingCanvasFrame.context.restore();
 	CANVASMANAGER.workingCanvasFrame.context.restore();
 
-	//this.textImageData = CANVASMANAGER.workingCanvasFrame.context.getImageData(0,0,this.width,this.height);
 	this.textImage.src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
 
 }
@@ -8920,67 +8900,6 @@ ImageTextBlock.prototype.getCurrentFrame = function() {
 		return null;
 	}
 }
-
-// // Public function
-// // Input parameters: string
-// // Returns: nothing
-// // Description: sets the text property of the TextBlock object
-// ImageTextBlock.prototype.setText = function(newText) {
-// 	PARAMS.initializeValidation();
-// 	newText = PARAMS.validateParam(PARAMS.STRING, newText);
-
-// 	this.text = newText;
-// }
-
-// // Public function
-// // Input parameters: string
-// // Returns: nothing
-// // Description: sets the font type property of the TextBlock object
-// ImageTextBlock.prototype.setFont = function(newFont) {
-// 	PARAMS.initializeValidation();
-// 	newFont = PARAMS.validateParam(PARAMS.STRING, newFont, "Arial, Helvetica, sans-serif");
-
-// 	this.font = newFont;
-// }
-
-// // Public function
-// // Input parameters: string
-// // Returns: nothing
-// // Description: sets the font size property of the TextBlock object
-// ImageTextBlock.prototype.setSize = function(newSize) {
-// 	PARAMS.initializeValidation();
-// 	newSize = PARAMS.validateParam(PARAMS.UNSIGNEDINTEGER, newSize);
-
-// 	this.size = newSize;
-// }
-
-// // Public function
-// // Input parameters: string
-// // Returns: nothing
-// // Description: sets the text color property of the TextBlock object
-// ImageTextBlock.prototype.setColor = function(newColor) {
-// 	PARAMS.initializeValidation();
-// 	newColor = PARAMS.validateParam(PARAMS.STRING, newColor, "#000");
-
-// 	this.color = newColor;
-// }
-
-// // Public function
-// // Input parameters: string
-// // Returns: nothing
-// // Description: sets the alignment property of the TextBlock object
-// ImageTextBlock.prototype.setAlignment = function(newAlignment) {
-// 	PARAMS.initializeValidation();
-// 	newAlignment = PARAMS.validateParam(PARAMS.STRING, newAlignment);
-
-// 	switch (newAlignment) {
-// 		case "left":
-// 		case "right":
-// 		case "center":
-// 			this.alignment = newAlignment;
-// 			break;
-// 	}
-// }
 
 // Private function
 // Input parameters: mouseEvent object
@@ -9065,12 +8984,7 @@ ImageTextBlock.prototype.undraw = function(dest) {
 			// 		break;
 			// }
 
-
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2)
-			var zratio = 1
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-originX + zratio*this._getX());
 			drawy = Math.round(-originY + zratio*this._getY());				
@@ -9080,12 +8994,6 @@ ImageTextBlock.prototype.undraw = function(dest) {
 			dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
 			dest.rotate(this._getRotation()*Math.PI/180);
 
-			//dest.clearRect(-originX - 1, -originY - 1, this.width + 2, this.height + 2);
-
-			// if (this.shatteredParent != null && this.homeX != undefined && this.homeY != undefined) {
-			// 	dest.clearRect(-this.width/2 - 1,-this.height/2 - 1,this.width + 2,this.height + 2);
-			// }
-			// else 
 			if (!this._getShattered()) {
 				dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
 			}
@@ -9166,12 +9074,7 @@ ImageTextBlock.prototype.draw = function(dest) {
 			// 		break;
 			// }
 
-
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-originX + zratio*this._getX());
 			drawy = Math.round(-originY + zratio*this._getY());
@@ -9191,19 +9094,11 @@ ImageTextBlock.prototype.draw = function(dest) {
 				break;
 			}
 			
-			//dest.drawImage(this.textImage,-originX,-originY);
-			
-			// if (this.shatteredParent != null && this.homeX != undefined && this.homeY != undefined) {
-			// 	dest.drawImage(this.shatteredParent.textImage,this.homeX+this.shatteredParent.width/2-this.width/2,this.homeY+this.shatteredParent.height/2-this.height/2,this.width,this.height,
-			// 									-this.width/2,-this.height/2,this.width,this.height);
-			// }
-			// else 
 			if (!this._getShattered()) {
 				var currentFrame = this.getCurrentFrame();
 				if (currentFrame != null) {	
 					dest.drawImage(currentFrame,-this._getWidth()/2,-this._getHeight()/2);
 				}
-				//dest.drawImage(this.textImage,-this.width/2,-this.height/2);
 			}
 
 			if (this.showDebugDisplay) {
@@ -9455,34 +9350,6 @@ ParagraphBlock.prototype.isMouseEventWithinBlock = function(e) {
 	}
 }
 
-// // Public function
-// // Input parameters: string
-// // Returns: nothing
-// // Description: sets the text property of the TextBlock object
-// ParagraphBlock.prototype.setText = function(newText) {
-// 	PARAMS.initializeValidation();
-// 	newText = PARAMS.validateParam(PARAMS.STRING, newText);
-
-// 	this.text = newText;
-// }
-
-// // Public function
-// // Input parameters: string (left, center, right)
-// // Returns: nothing
-// // Description: sets the alignment property of the TextBlock object
-// ParagraphBlock.prototype.setAlignment = function(newAlignment) {
-// 	PARAMS.initializeValidation();
-// 	newAlignment = PARAMS.validateParam(PARAMS.STRING, newAlignment);
-
-// 	switch (newAlignment) {
-// 		case "left":
-// 		case "right":
-// 		case "center":
-// 			this.alignment = newAlignment;
-// 			break;
-// 	}
-// }
-
 // Private function
 // Input parameters: canvas context where the undrawing should occur
 // Returns: nothing
@@ -9496,11 +9363,7 @@ ParagraphBlock.prototype.undraw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2)
-			var zratio = 1
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(zratio*this._getX());
 			drawy = Math.round(zratio*this._getY());				
@@ -9554,85 +9417,6 @@ ParagraphBlock.prototype.undraw = function(dest) {
 // Description: overrides ActorBlock.update,
 // handles text and font updates
 ParagraphBlock.prototype.update = function() {
-	// if (this.hasChangedFromLatestMemory(true)) {
-	// 	CANVASMANAGER.workingCanvasFrame.context.save();
-	// 	CANVASMANAGER.workingCanvasFrame.context.font = this.size + "px " + this.font;
-	// 	CANVASMANAGER.workingCanvasFrame.context.fillStyle = this.color;
-	// 	CANVASMANAGER.workingCanvasFrame.context.fillText(this.text, 0, 0);
-
-	// 	this.textFragments.length = 0;
-	// 	this.textFragments[0] = { text: "", width: 0 };
-	// 	var currentFragmentIndex = 0;
-
-	// 	var lines = this.text.split("\n");
-
-	// 	for (var l = 0; l < lines.length; l++) {
-	// 		var words = lines[l].split(" ");
-
-	// 		for (var i = 0; i < words.length; i++) {
-	// 			var newFragment = this.textFragments[currentFragmentIndex].text + words[i];
-	// 			var fragmentWidth = CANVASMANAGER.workingCanvasFrame.context.measureText(newFragment).width;
-
-	// 			if (fragmentWidth <= this.width) {
-	// 				this.textFragments[currentFragmentIndex].text = newFragment + " ";
-	// 				this.textFragments[currentFragmentIndex].width = fragmentWidth;
-	// 			}
-	// 			else if (newFragment.length == words[i].length) {
-	// 				var prevChunk = "";
-	// 				for (var j = 0; j < newFragment.length; j++) {
-	// 					var newChunk = this.textFragments[currentFragmentIndex].text + newFragment.charAt(j);
-	// 					var chunkWidth = CANVASMANAGER.workingCanvasFrame.context.measureText(newChunk).width;
-	// 					if (chunkWidth <= this.width) {
-	// 						this.textFragments[currentFragmentIndex].text += newFragment.charAt(j);
-	// 						this.textFragments[currentFragmentIndex].width = chunkWidth;
-	// 					}
-	// 					else if (newChunk.length == 1) {
-	// 						this.textFragments[currentFragmentIndex].text = newChunk;
-	// 						this.textFragments[currentFragmentIndex].width = chunkWidth;
-	// 						currentFragmentIndex++;
-	// 						this.textFragments[currentFragmentIndex] = { text: "", width: 0 };
-	// 					}
-	// 					else {
-	// 						currentFragmentIndex++;
-	// 						this.textFragments[currentFragmentIndex] = { text: "", width: 0 };
-	// 						j--;
-	// 					}
-	// 				}
-	// 				if (this.textFragments[currentFragmentIndex].text.length > 0) {
-	// 					this.textFragments[currentFragmentIndex].text += " ";
-	// 				} 
-	// 			}
-	// 			else {
-	// 				currentFragmentIndex++;
-	// 				this.textFragments[currentFragmentIndex] =  { text: "", width: 0 };
-	// 				i--;
-	// 			}
-	// 		}
-	// 		currentFragmentIndex++;
-	// 		this.textFragments[currentFragmentIndex] =  { text: "", width: 0 };
-	// 	}
-
-	// 	if (this.textFragments[currentFragmentIndex].text == "") {
-	// 		this.textFragments.pop();
-	// 	}
-
-	// 	CANVASMANAGER.workingCanvasFrame.context.restore();
-
-	// 	var metric = TEXTHELPER.measureTextHeight(this.textFragments[0].text,this.font,this.size);
-	// 	this.lineHeight = metric.height;
-	// 	this.ascent = metric.ascent;
-	// 	this.descent = metric.descent;
-
-	// 	if (this.lineHeight == 0) { this.lineHeight = 1; }	
-
-	// 	// m is an additional buffer in case the font isn't set up properly
-	// 	// causing parts of the font to be cut off
-	// 	var m = CANVASMANAGER.workingCanvasFrame.context.measureText("M").width;
-	// 	this.height = this.textFragments.length * this.lineHeight + (this.textFragments.length - 1) * this.lineSpacing + m;
-	// }
-
-	
-
 	ActorBlock.prototype.update.call(this);
 
 	this._setText(this.text);
@@ -9741,12 +9525,7 @@ ParagraphBlock.prototype.draw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(zratio*this._getX());
 			drawy = Math.round(zratio*this._getY());
@@ -9900,7 +9679,6 @@ var ImageParagraphBlock = function(widthParam, textParam, fontParam, sizeParam, 
 	var lineSpacing = 0;
 	var lineHeight = 0;
 	var alignment = "";
-	var shattered = false;
 
 	this._getText = function() { return text; };
 	this._getFont = function() { return font; };
@@ -9909,7 +9687,6 @@ var ImageParagraphBlock = function(widthParam, textParam, fontParam, sizeParam, 
 	this._getLineSpacing = function() { return lineSpacing; };
 	this._getLineHeight = function() { return lineHeight; };
 	this._getAlignment = function() { return alignment; };
-	this._getShattered = function() { return shattered; };
 
 	this._setText = function(val) { text = val; };
 	this._setFont = function(val) { font = val; };
@@ -9925,7 +9702,6 @@ var ImageParagraphBlock = function(widthParam, textParam, fontParam, sizeParam, 
 				alignment = val; 
 		}
 	};
-	this._setShattered = function(val) { shattered = val; };
 
 	this.width = widthParam;
 	this.lineHeight = 0;
@@ -9951,15 +9727,13 @@ var ImageParagraphBlock = function(widthParam, textParam, fontParam, sizeParam, 
 	this.ascent = 0;
 	this.descent = 0;
 	
-	//this.textImageData = null;
 	this.textImage = new Image();
 
 	this.maskMode = "none";
-
-	this.shattered = false;
 }
 
 ImageParagraphBlock.prototype = new ActorBlock();
+ImageParagraphBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -10079,84 +9853,6 @@ ImageParagraphBlock.prototype.getCurrentFrame = function() {
 	}
 }
 
-// // Public function
-// // Input parameters: string
-// // Returns: nothing
-// // Description: sets the text property of the TextBlock object
-// ImageParagraphBlock.prototype.setText = function(newText) {
-// 	PARAMS.initializeValidation();
-// 	newText = PARAMS.validateParam(PARAMS.STRING, newText);
-
-// 	this.text = newText;
-// }
-
-// // Public function
-// // Input parameters: string (left, center, right)
-// // Returns: nothing
-// // Description: sets the alignment property of the TextBlock object
-// ImageParagraphBlock.prototype.setAlignment = function(newAlignment) {
-// 	PARAMS.initializeValidation();
-// 	newAlignment = PARAMS.validateParam(PARAMS.STRING, newAlignment);
-
-// 	switch (newAlignment) {
-// 		case "left":
-// 		case "right":
-// 		case "center":
-// 			this.alignment = newAlignment;
-// 			break;
-// 	}
-// }
-
-// Public function
-// Input parameters: the new size for the shattered blocks (integer)
-// Returns: nothing
-// Description: shatters the current block's frames into an an array of new child blocks, 
-// each with a small part of the original image/animation
-ImageParagraphBlock.prototype.shatter = function(newBlockSize) {
-	PARAMS.initializeValidation();
-	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
-	
-	if (!this.shattered) {
-		var blockClusterPositions = new Array();
-
-		var blockIndex = 0;
-		for (var i = 0; i < this.width; i += newBlockSize) {
-			for (var j = 0; j < this.height; j += newBlockSize) {
-				if (blockClusterPositions[blockIndex] == undefined) {
-					blockClusterPositions[blockIndex] = {"x":Math.floor(i - this.width/2 + newBlockSize/2), "y":Math.floor(j - this.height/2 + newBlockSize/2)};
-				}
-				
-				blockIndex++;
-			}
-		}
-
-		for (var i = 0; i < blockClusterPositions.length; i++) {
-			var newBlock = new FragmentBlock(this, newBlockSize, newBlockSize, blockClusterPositions[i].x, blockClusterPositions[i].y, 0);
-
-			newBlock.setMemoryCapacity(this.memoryCapacity);
-			
-			this.adoptChild(newBlock);
-		}
-
-		this.shattered = true;
-	}
-}
-
-// Public function
-// Input parameters: none
-// Returns: nothing
-// Description: removes child blocks resulting from shatter
-ImageParagraphBlock.prototype.unshatter = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i] instanceof FragmentBlock) {
-			this.children[i].destroy();
-			this.children.splice(i,1);
-			i--;
-		}
-	}
-	this.shattered = false;
-}
-
 // Private function
 // Input parameters: none
 // Returns: nothing
@@ -10256,11 +9952,7 @@ ImageParagraphBlock.prototype.undraw = function(dest) {
 			// }
 
 
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2)
-			var zratio = 1
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-originX + zratio*this._getX());
 			drawy = Math.round(-originY + zratio*this._getY());				
@@ -10436,11 +10128,7 @@ ImageParagraphBlock.prototype.draw = function(dest) {
 			// }
 
 
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-originX + zratio*this._getX());
 			drawy = Math.round(-originY + zratio*this._getY());
@@ -10546,7 +10234,7 @@ var VideoBlock = function(videoAlias, width, height) {
 	height = PARAMS.validateParam(PARAMS.UNSIGNEDINTEGER, height);
 
 	LOG.write("VideoBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	var video = null;
 
@@ -10560,16 +10248,11 @@ var VideoBlock = function(videoAlias, width, height) {
 	this.height = height;
 
 	this.currentTime = this.video ? 0 : this.video.getCurrentTime();
-
-	var shattered = false;
-
-	this._getShattered = function() { return shattered; };
-	this._setShattered = function(val) { shattered = val };
-
-	this.shattered = shattered;
 }
 
-VideoBlock.prototype = new PlayerBlock();
+VideoBlock.prototype = new ActorBlock();
+VideoBlock.prototype.learn(PlayerTraits);
+VideoBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -10742,17 +10425,6 @@ VideoBlock.prototype.shatter = function(newBlockSize) {
 			var newBlock = new FragmentBlock(this, newBlockSize, newBlockSize, blockClusterPositions[i].x, blockClusterPositions[i].y, 0);
 
 			newBlock.setMemoryCapacity(this.memoryCapacity);
-
-			// newBlock.x = blockClusterPositions[i].x;
-			// newBlock.y = blockClusterPositions[i].y;
-			// newBlock.z = 0;
-
-			// newBlock.homeX = blockClusterPositions[i].x;
-			// newBlock.homeY = blockClusterPositions[i].y;
-			// newBlock.homeZ = 0;
-
-			// newBlock.width = newBlockSize;
-			// newBlock.height = newBlockSize;
 			
 			this.adoptChild(newBlock);
 		}
@@ -10811,11 +10483,7 @@ VideoBlock.prototype.undraw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2)
-			var zratio = 1
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -10825,12 +10493,6 @@ VideoBlock.prototype.undraw = function(dest) {
 			dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
 			dest.rotate(this._getRotation()*Math.PI/180);
 
-			//dest.clearRect(-this.width/2 - 1, -this.height/2 - 1, this.width + 2, this.height + 2);
-
-			// if (this.parent.shattered && this.homeX != undefined && this.homeY != undefined) {
-			// 	dest.clearRect(-this.width/2 - 1,-this.height/2 - 1,this.width + 2,this.height + 2);
-			// }
-			// else 
 			if (!this._getShattered() && this._getVideo()) {
 				dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
 			}
@@ -10875,11 +10537,7 @@ VideoBlock.prototype.draw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -10899,27 +10557,6 @@ VideoBlock.prototype.draw = function(dest) {
 			// 	break;
 			// }
 			
-			// var currentFrame = this.getCurrentFrame();
-			// if (currentFrame != null) {	
-			// 	dest.drawImage(currentFrame,-this.width/2,-this.height/2);
-			// }
-
-			//dest.drawImage(this.video.video,-this.width/2,-this.height/2,this.width,this.height);
-
-			// if (this.parent.shattered && this.homeX != undefined && this.homeY != undefined) {
-			// 	var xratio = this.parent.width / this.parent.video.video.videoWidth;
-			// 	var yratio = this.parent.height / this.parent.video.video.videoHeight;
-			// 	dest.drawImage(this.parent.video.video,
-			// 					(this.homeX+this.parent.width/2-this.width/2)/xratio,
-			// 					(this.homeY+this.parent.height/2-this.height/2)/yratio,
-			// 					this.width/xratio,
-			// 					this.height/yratio,
-			// 					-this.width/2,
-			// 					-this.height/2,
-			// 					this.width,
-			// 					this.height);
-			// }
-			// else 
 			if (!this._getShattered() && this._getVideo()) {
 				dest.drawImage(this._getVideo().video,-this._getWidth()/2,-this._getHeight()/2,this._getWidth(),this._getHeight());
 			}
@@ -10996,6 +10633,7 @@ var DrawingBlock = function(width,height) {
 }
 
 DrawingBlock.prototype = new ActorBlock();
+DrawingBlock.prototype.learn(CanvasTraits);
 
 // Private function
 // Input parameters: none
@@ -11257,11 +10895,7 @@ DrawingBlock.prototype.undraw = function(dest) {
 	
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -11272,7 +10906,7 @@ DrawingBlock.prototype.undraw = function(dest) {
 			dest.rotate(this._getRotation()*Math.PI/180);
 			
 			dest.clearRect(-this._getWidth()/2-1,-this._getHeight()/2-1,this._getWidth()+2,this._getHeight()+2);
-			parseCanvasCommands(dest,this.undrawingCommands);
+			this.parseCanvasCommands(dest,this.undrawingCommands);
 
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].undraw(dest);
@@ -11311,11 +10945,7 @@ DrawingBlock.prototype.draw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -11336,7 +10966,7 @@ DrawingBlock.prototype.draw = function(dest) {
 			// 	break;
 			// }
 			
-			parseCanvasCommands(dest,this.drawingCommands);
+			this.parseCanvasCommands(dest,this.drawingCommands);
 
 			dest.translate(this._getWidth()/2,this._getHeight()/2);
 
@@ -11406,16 +11036,11 @@ var ImageDrawingBlock = function(width,height) {
 	this.drawingCommands = new Array();
 
 	this.canvasImage = new Image();
-
-	var shattered = false;
-
-	this._getShattered = function() { return shattered; };
-	this._setShattered = function(val) { shattered = val; };
-
-	this.shattered = false;
 }
 
 ImageDrawingBlock.prototype = new ActorBlock();
+ImageDrawingBlock.prototype.learn(CanvasTraits);
+ImageDrawingBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -11519,55 +11144,55 @@ ImageDrawingBlock.prototype.hasChangedFromLatestMemory = function(excludeParentP
 	}
 }
 
-// Public function
-// Input parameters: the new size for the shattered blocks (integer)
-// Returns: nothing
-// Description: shatters the current block's frames into an an array of new child blocks, 
-// each with a small part of the original image/animation
-ImageDrawingBlock.prototype.shatter = function(newBlockSize) {
-	PARAMS.initializeValidation();
-	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
+// // Public function
+// // Input parameters: the new size for the shattered blocks (integer)
+// // Returns: nothing
+// // Description: shatters the current block's frames into an an array of new child blocks, 
+// // each with a small part of the original image/animation
+// ImageDrawingBlock.prototype.shatter = function(newBlockSize) {
+// 	PARAMS.initializeValidation();
+// 	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
 	
-	if (!this.shattered) {
-		var blockClusterPositions = new Array();
+// 	if (!this.shattered) {
+// 		var blockClusterPositions = new Array();
 
-		var blockIndex = 0;
-		for (var i = 0; i < this.width; i += newBlockSize) {
-			for (var j = 0; j < this.height; j += newBlockSize) {
-				if (blockClusterPositions[blockIndex] == undefined) {
-					blockClusterPositions[blockIndex] = {"x":Math.floor(i - this.width/2 + newBlockSize/2), "y":Math.floor(j - this.height/2 + newBlockSize/2)};
-				}
+// 		var blockIndex = 0;
+// 		for (var i = 0; i < this.width; i += newBlockSize) {
+// 			for (var j = 0; j < this.height; j += newBlockSize) {
+// 				if (blockClusterPositions[blockIndex] == undefined) {
+// 					blockClusterPositions[blockIndex] = {"x":Math.floor(i - this.width/2 + newBlockSize/2), "y":Math.floor(j - this.height/2 + newBlockSize/2)};
+// 				}
 				
-				blockIndex++;
-			}
-		}
+// 				blockIndex++;
+// 			}
+// 		}
 
-		for (var i = 0; i < blockClusterPositions.length; i++) {
-			var newBlock = new FragmentBlock(this,newBlockSize,newBlockSize,blockClusterPositions[i].x,blockClusterPositions[i].y,0);
+// 		for (var i = 0; i < blockClusterPositions.length; i++) {
+// 			var newBlock = new FragmentBlock(this,newBlockSize,newBlockSize,blockClusterPositions[i].x,blockClusterPositions[i].y,0);
 
-			newBlock.setMemoryCapacity(this.memoryCapacity);
+// 			newBlock.setMemoryCapacity(this.memoryCapacity);
 			
-			this.adoptChild(newBlock);
-		}
+// 			this.adoptChild(newBlock);
+// 		}
 
-		this.shattered = true;
-	}
-}
+// 		this.shattered = true;
+// 	}
+// }
 
-// Public function
-// Input parameters: none
-// Returns: nothing
-// Description: removes child blocks resulting from shatter
-ImageDrawingBlock.prototype.unshatter = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i] instanceof FragmentBlock) {
-			this.children[i].destroy();
-			this.children.splice(i,1);
-			i--;
-		}
-	}
-	this.shattered = false;
-}
+// // Public function
+// // Input parameters: none
+// // Returns: nothing
+// // Description: removes child blocks resulting from shatter
+// ImageDrawingBlock.prototype.unshatter = function() {
+// 	for (var i = 0; i < this.children.length; i++) {
+// 		if (this.children[i] instanceof FragmentBlock) {
+// 			this.children[i].destroy();
+// 			this.children.splice(i,1);
+// 			i--;
+// 		}
+// 	}
+// 	this.shattered = false;
+// }
 
 // Public function
 // Input parameters: none
@@ -11662,7 +11287,7 @@ ImageDrawingBlock.prototype.createDrawingData = function() {
 
 		CANVASMANAGER.workingCanvasFrame.resize(this.width,this.height,-1);
 		CANVASMANAGER.workingCanvasFrame.context.clearRect(0,0,this.width,this.height);
-		parseCanvasCommands(CANVASMANAGER.workingCanvasFrame.context,this.drawingCommands);
+		this.parseCanvasCommands(CANVASMANAGER.workingCanvasFrame.context,this.drawingCommands);
 
 		CANVASMANAGER.workingCanvasFrame.context.restore();
 
@@ -11684,11 +11309,7 @@ ImageDrawingBlock.prototype.undraw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -11749,11 +11370,7 @@ ImageDrawingBlock.prototype.draw = function(dest) {
 	var drawy = 0;
 	try {
 		if (this._getVisible()) {
-			var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-			var zratio = 1;
-			if ((this._getZ() + zscale) != 0) {
-				zratio = 1 / ((this._getZ() + zscale) / zscale);
-			} 
+			var zratio = this.getZRatio();
 
 			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
 			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
@@ -12140,11 +11757,32 @@ CanvasManager.prototype.addCanvasFrame = function(canvasFrame) {
 	var index = this.canvasFrameStack.indexOf(canvasFrame);
 	
 	if (index > -1) {
-		this.canvasFrameStack.splice(index, 1);
-		this.gallery.removeChild(canvasFrame.canvas);
+		this.canvasFrameStack[index] = undefined;
+		//this.canvasFrameStack.splice(index, 1);
+		//this.gallery.removeChild(canvasFrame.canvas);
+		document.body.removeChild(canvasFrame.canvas);
 	}
 
 	this.canvasFrameStack.push(canvasFrame);
+
+	//this.gallery.appendChild(canvasFrame.canvas);
+	document.body.appendChild(canvasFrame.canvas);
+}
+
+CanvasManager.prototype.insertCanvasFrame = function(canvasFrame, insertionIndex) {
+	PARAMS.initializeValidation();
+	canvasFrame = PARAMS.validateParam(PARAMS.CANVASFRAME, canvasFrame);
+
+	var index = this.canvasFrameStack.indexOf(canvasFrame);
+	
+	if (index > -1) {
+		this.canvasFrameStack[index] = undefined;
+		// this.canvasFrameStack.splice(index, 1);
+		// this.gallery.removeChild(canvasFrame.canvas);
+		document.body.removeChild(canvasFrame.canvas);
+	}
+
+	this.canvasFrameStack[insertionIndex] = canvasFrame;
 
 	//this.gallery.appendChild(canvasFrame.canvas);
 	document.body.appendChild(canvasFrame.canvas);
@@ -12153,7 +11791,6 @@ CanvasManager.prototype.addCanvasFrame = function(canvasFrame) {
 CanvasManager.prototype.addNewCanvasFrame = function() {
 	var canvasFrame = new CanvasFrame(this.width, this.height, this.canvasFrameStack.length);
 	this.canvasFrameStack.push(canvasFrame);
-	//this.gallery.appendChild(canvasFrame.canvas);
 	document.body.appendChild(canvasFrame.canvas);
 }
 
@@ -12162,18 +11799,17 @@ CanvasManager.prototype.adoptBlockChild = function(block, canvasFrameIndex) {
 	block = PARAMS.validateParam(PARAMS.BLOCK, block);
 	canvasFrameIndex = PARAMS.validateParam(PARAMS.INTEGER, canvasFrameIndex);
 
-	if (this.canvasFrameStack.length > 0) {
-		if (canvasFrameIndex != null) {
-			this.canvasFrameStack[canvasFrameIndex].adoptBlockChild(block);
-		}
-		else {
-			this.canvasFrameStack[0].adoptBlockChild(block);
-		}
+	// if (canvasFrameIndex == null) {
+	// 	canvasFrameIndex = 0;
+	// }
+
+	if (!this.canvasFrameStack[canvasFrameIndex]) {
+		var canvasFrame = new CanvasFrame(this.width, this.height, canvasFrameIndex);
+		this.insertCanvasFrame(canvasFrame,canvasFrameIndex);
+
 	}
-	else {
-		LOG.write("No CanvasFrames have been added to this instance of CanvasManager, so no Block children can be adopted.  Please create and add a new CanvasFrame in order to give this Block child a home.", LOG.WARN);
-	}
-	
+
+	this.canvasFrameStack[canvasFrameIndex].adoptBlockChild(block);
 }
 
 CanvasManager.prototype.refreshAll = function() {
@@ -12962,7 +12598,7 @@ function addFleeBehaviors(obj,e) {
 	if (!obj.shattered) {
 		obj.shatter(8);
 		obj.addBehavior(unshatterWhenChildrenAreHome,{});
-		obj.addBehavior(fleeAndReturn,{},true);
+		obj.addBehaviorToChildren(fleeAndReturn,{});
 	}
 }
 

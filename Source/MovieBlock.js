@@ -7,7 +7,7 @@ var MovieBlock = function() {
 	PARAMS.validateArguments([PARAMS.REST, PARAMS.STRING], arguments);
 
 	LOG.write("MovieBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	this.frameAliases = new Array();
 
@@ -15,16 +15,6 @@ var MovieBlock = function() {
 		this.frameAliases[i] = arguments[i];
 	}
 
-	//var imgDataArrayCopy = new Array();
-
-	//for (var i = 0; i < imgDataArray.length; i++) {
-	//	var copy = CANVASMANAGER.workingCanvasFrame.context.createImageData(imgDataArray[i].width, imgDataArray[i].height);
-	//	copy.data.set(imgDataArray[i].data);
-	//	imgDataArrayCopy[i] = copy;
-	//}
-
-	//this.originalImageDataArray = imgDataArray;
-	this.frameData = new Array();
 	this.frames = new Array();
 
 	this.filters = new Array();
@@ -38,16 +28,11 @@ var MovieBlock = function() {
 	this.currentFrameIndex = -1;
 
 	this.maskMode = "none";
-
-	var shattered = false;
-
-	this._getShattered = function() { return shattered; };
-	this._setShattered = function(val) { shattered = val; };
-
-	this.shattered = shattered;
 }
 
-MovieBlock.prototype = new PlayerBlock();
+MovieBlock.prototype = new ActorBlock();
+MovieBlock.prototype.learn(PlayerTraits);
+MovieBlock.prototype.learn(ShatterTraits);
 
 // Private function
 // Input parameters: none
@@ -87,63 +72,6 @@ MovieBlock.prototype.hasChangedFromLatestMemory = function() {
 	}
 }
 
-// // Private function
-// // Input parameters: none
-// // Returns: nothing
-// // Description: function for internal use, populates the frameData property with imgData from this object's image aliases
-// MovieBlock.prototype.createFrameData = function() {
-// 	var imgDataArray = CANVASMANAGER.getImageAssetData(this.frameAliases);
-// 	var imgDataArrayCopy = new Array();
-
-// 	for (var i = 0; i < imgDataArray.length; i++) {
-// 		var copy = CANVASMANAGER.workingCanvasFrame.context.createImageData(imgDataArray[i].width, imgDataArray[i].height);
-// 		copy.data.set(imgDataArray[i].data);
-// 		imgDataArrayCopy[i] = copy;
-// 	}
-
-// 	this.frameData = imgDataArrayCopy;
-// }
-
-// // Public function
-// // Input parameters: an array of imgData objects
-// // Returns: nothing
-// // Description: function for external use, populates the frameData property with the input parameter
-// // currently only used to populate imgData for child blocks when shattering a block object
-// MovieBlock.prototype.setFrameData = function(imgDataArray) {
-// 	this.frameData = imgDataArray;
-// }
-
-// // Public function
-// // Input parameters: none
-// // Returns: nothing
-// // Description: function for external use, 
-// // transforms the imgData from the frameData property of the object into images for the frames property
-// // currently only used to update child blocks when shattering a block object
-// MovieBlock.prototype.updateFrames = function() {
-// 	//this.frames.splice(0,this.frames.length);
-// 	for (var i = 0; i < this.frameData.length; i++) {
-// 		CANVASMANAGER.workingCanvasFrame.resize(this.frameData[i].width,this.frameData[i].height,-1);
-// 		CANVASMANAGER.workingCanvasFrame.context.clearRect(0,0,this.frameData[i].width,this.frameData[i].height);
-// 		CANVASMANAGER.workingCanvasFrame.context.putImageData(this.frameData[i],0,0);
-// 		//var workingImage = new Image();
-// 		//workingImage.src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
-// 		//this.frames[i] = workingImage;
-// 		if (this.frames[i] == null) {
-// 			this.frames[i] = new Image();
-// 		}
-// 		this.frames[i].src = CANVASMANAGER.workingCanvasFrame.canvas.toDataURL();
-// 	}
-// }
-
-// MovieBlock.prototype.getFrameAliasesFromShatteredParent = function() {
-// 	if (this.shatteredParent != null) {
-// 		return this.shatteredParent.getFrameAliasesFromShatteredParent();
-// 	}
-// 	else {
-// 		return this.frameAliases;
-// 	}
-// }
-
 // Public function
 // Input parameters: the new size for the shattered blocks (integer)
 // Returns: nothing
@@ -152,75 +80,20 @@ MovieBlock.prototype.hasChangedFromLatestMemory = function() {
 MovieBlock.prototype.shatter = function(newBlockSize) {
 	PARAMS.initializeValidation(); 
 	newBlockSize = PARAMS.validateParam(PARAMS.INTEGER, newBlockSize);
-	
-	if (!this.shattered) {
-		var blockClusterPositions = new Array();
-		var maxWidth = 0;
-		var maxHeight = 0;
 
-		var length = this.frameAliases.length;
+	var maxWidth = 0;
+	var maxHeight = 0;
 
-		for (var k = 0; k < length; k++) {
-			// if (this.shatteredParent != null) {
-			// 	maxWidth = this.width;
-			// 	maxHeight = this.height;
-			// }
-			// else {
-				var frame = this.getFrame(k);
+	var length = this.frameAliases.length;
 
-				if (frame.width > maxWidth) { maxWidth = frame.width; }
-				if (frame.height > maxHeight) { maxHeight = frame.height; }
-			// }
-		}
+	for (var k = 0; k < length; k++) {
+		var frame = this.getFrame(k);
 
-		var blockIndex = 0;
-		for (var i = 0; i < maxWidth; i += newBlockSize) {
-			for (var j = 0; j < maxHeight; j += newBlockSize) {
-				if (blockClusterPositions[blockIndex] == undefined) {
-					blockClusterPositions[blockIndex] = {"x":Math.floor(i - maxWidth/2 + newBlockSize/2), "y":Math.floor(j - maxHeight/2 + newBlockSize/2)};
-				}
-				
-				blockIndex++;
-			}
-		}
-
-		for (var i = 0; i < blockClusterPositions.length; i++) {
-			var newBlock = new FragmentBlock(this, newBlockSize,newBlockSize,blockClusterPositions[i].x,blockClusterPositions[i].y,0);
-			//newBlock.shatteredParent = this;
-
-			newBlock.setMemoryCapacity(this.memoryCapacity);
-
-			//newBlock.x = blockClusterPositions[i].x;
-			//newBlock.y = blockClusterPositions[i].y;
-			//newBlock.z = 0;
-
-			//newBlock.homeX = blockClusterPositions[i].x;
-			//newBlock.homeY = blockClusterPositions[i].y;
-			//newBlock.homeZ = 0;
-
-			//newBlock.width = newBlockSize;
-			//newBlock.height = newBlockSize;
-			
-			this.adoptChild(newBlock);
-		}
-
-		this.shattered = true;
+		if (frame.width > maxWidth) { maxWidth = frame.width; }
+		if (frame.height > maxHeight) { maxHeight = frame.height; }
 	}
-}
 
-// Public function
-// Input parameters: none
-// Returns: nothing
-// Description: removes child blocks resulting from shatter
-MovieBlock.prototype.unshatter = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i] instanceof FragmentBlock) {
-			this.children[i].destroy();
-			this.children.splice(i,1);
-			i--;
-		}
-	}
-	this.shattered = false;
+	ShatterTraits.prototype.shatter.call(this, newBlockSize, maxWidth, maxHeight);
 }
 
 // Public function
@@ -243,15 +116,6 @@ MovieBlock.prototype.getCurrentFrame = function() {
 		return null;
 	}
 }
-
-// MovieBlock.prototype.getCurrentFrameFromShatteredParent = function() {
-// 	if (this.shatteredParent != null) {
-// 		return this.shatteredParent.getCurrentFrameFromShatteredParent();
-// 	}
-// 	else {
-// 		return this.getCurrentFrame();
-// 	}
-// }
 
 // Public function
 // Input parameters: integer index of the desired frame
@@ -276,15 +140,6 @@ MovieBlock.prototype.getFrame = function(frameIndex) {
 		return null;
 	}
 }
-
-// MovieBlock.prototype.getFrameFromShatteredParent = function(frameIndex) {
-// 	if (this.shatteredParent != null) {
-// 		return this.shatteredParent.getFrameFromShatteredParent(frameIndex);
-// 	}
-// 	else {
-// 		return this.getFrame(frameIndex);
-// 	}
-// }
 
 MovieBlock.prototype.play = function() {
 	this.isPlaying = true;
@@ -317,51 +172,37 @@ MovieBlock.prototype.undraw = function(dest) {
 	PARAMS.initializeValidation();
 	dest = PARAMS.validateParam(PARAMS.CANVAS2DCONTEXT, dest);
 
-	if (this.frameAliases.length > 0 || this.frames.length > 0) {
-		var drawx = 0;
-		var drawy = 0;
-		
-		try {
-			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) > 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+	var drawx = 0;
+	var drawy = 0;
+	
+	try {
+		if (this._getVisible()) {
+			var zratio = this.getZRatio();
 
-				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
-				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
+			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
+			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
 
-				dest.save();
-				dest.translate(drawx + this._getWidth()/2,drawy+this._getHeight()/2);
-				dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
-				dest.rotate(this._getRotation()*Math.PI/180);
+			dest.save();
+			dest.translate(drawx + this._getWidth()/2,drawy+this._getHeight()/2);
+			dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
+			dest.rotate(this._getRotation()*Math.PI/180);
 
-				// if (!this.shattered) {
-				// 	dest.clearRect(-this.width/2 - 1, -this.height/2 - 1, this.width + 2, this.height + 2);
-				// }
-
-				// if (this.shatteredParent != null && !this.shattered && this.homeX != undefined && this.homeY != undefined) {
-				// 	dest.clearRect(-this.width/2 - 1,-this.height/2 - 1,this.width + 2,this.height + 2);
-				// }
-				// else 
-				if (!this._getShattered()) {
-					dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
-				}
-
-				for (var i = 0; i < this.children.length; i++) {
-					this.children[i].undraw(dest);
-				}
-
-				dest.restore();
+			if (!this._getShattered()) {
+				dest.clearRect(-this._getWidth()/2 - 1,-this._getHeight()/2 - 1,this._getWidth() + 2,this._getHeight() + 2);
 			}
+
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].undraw(dest);
+			}
+
+			dest.restore();
 		}
-		catch (err) {
-			LOG.write("error in MovieBlock.undraw at: " + drawx + " " + drawy, LOG.ERROR);
-			LOG.writeBlock(this, LOG.ERROR);
-			LOG.writeObject(err, LOG.ERROR);
-			debugger;
-		}
+	}
+	catch (err) {
+		LOG.write("error in MovieBlock.undraw at: " + drawx + " " + drawy, LOG.ERROR);
+		LOG.writeBlock(this, LOG.ERROR);
+		LOG.writeObject(err, LOG.ERROR);
+		debugger;
 	}
 }
 
@@ -371,33 +212,13 @@ MovieBlock.prototype.undraw = function(dest) {
 // Description: overrides ActorBlock.update,
 // handles frame updates and filter/mask application
 MovieBlock.prototype.update = function() {
-	// if (this.isPlaying) {
-	// 	this.currentFrameIndex++;
-
-	// 	if ((this.frameAliases.length > 0 && this.currentFrameIndex >= this.frameAliases.length) ||
-	// 		 (this.frameData.length > 0 && this.currentFrameIndex >= this.frameData.length)) {
-	// 		 this.currentFrameIndex = 0;
-	// 	}
-	// }
-
-	// if (this.currentFrameIndex < 0) {
-	// 	this.currentFrameIndex = 0;
-	// }
-
-	// var currentFrame = this.getCurrentFrame();
-
-	// if (currentFrame != null) {
-	// 	this.width = currentFrame.width;
-	// 	this.height = currentFrame.height;
-	// }
-
 	ActorBlock.prototype.update.call(this);
 
 	if (this.isPlaying) {
 		this.currentFrameIndex++;
 
 		if ((this.frameAliases.length > 0 && this.currentFrameIndex >= this.frameAliases.length) ||
-			 (this.frameData.length > 0 && this.currentFrameIndex >= this.frameData.length)) {
+			 (this.frames.length > 0 && this.currentFrameIndex >= this.frames.length)) {
 			 this.currentFrameIndex = 0;
 		}
 	}
@@ -418,14 +239,6 @@ MovieBlock.prototype.update = function() {
 
 	this._setShattered(this.shattered);
 
-	// was there a reason this was under the superclass update?
-	// var currentFrame = this.getCurrentFrame();
-
-	// if (currentFrame != null) {
-	// 	this.width = currentFrame.width;
-	// 	this.height = currentFrame.height;
-	// }
-
 	this.applyFiltersAndMasks();
 }
 
@@ -438,129 +251,72 @@ MovieBlock.prototype.draw = function(dest) {
 	PARAMS.initializeValidation();
 	dest = PARAMS.validateParam(PARAMS.CANVAS2DCONTEXT, dest);
 
-	if (this.frameAliases.length > 0 || this.frames.length > 0) {
-		var drawx = 0;
-		var drawy = 0;
-		
-		try {
-			if (this._getVisible()) {
-				var zscale = 2*Math.tan(CANVASMANAGER.fov*(Math.PI/180)/2);
-				var zratio = 1;
-				if ((this._getZ() + zscale) != 0) {
-					zratio = 1 / ((this._getZ() + zscale) / zscale);
-				} 
+	var drawx = 0;
+	var drawy = 0;
+	
+	try {
+		if (this._getVisible()) {
+			var zratio = this.getZRatio();
 
-				drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
-				drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
+			drawx = Math.round(-this._getWidth() / 2 + zratio*this._getX());
+			drawy = Math.round(-this._getHeight() / 2 + zratio*this._getY());
 
+			dest.save();
+			dest.translate(drawx + this._getWidth()/2,drawy+this._getHeight()/2);
+			dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
+			dest.rotate(this._getRotation()*Math.PI/180);
+
+			switch(this.maskMode) {
+				case "window":
+					dest.globalCompositeOperation = "destination-in";
+				break;
+
+				case "wall":
+					dest.globalCompositeOperation = "destination-out";
+				break;
+			}
+			
+			if (!this._getShattered()) {
+				var currentFrame = this.getCurrentFrame();
+				if (currentFrame != null) {	
+					dest.drawImage(currentFrame,-this._getWidth()/2,-this._getHeight()/2);
+				}
+			}
+			 
+
+			if (this.showDebugDisplay) {
 				dest.save();
-				dest.translate(drawx + this._getWidth()/2,drawy+this._getHeight()/2);
-				dest.scale(zratio*this._getScaleX(),zratio*this._getScaleY());
-				dest.rotate(this._getRotation()*Math.PI/180);
-
-				switch(this.maskMode) {
-					case "window":
-						dest.globalCompositeOperation = "destination-in";
-					break;
-
-					case "wall":
-						dest.globalCompositeOperation = "destination-out";
-					break;
-				}
-				
-
-				// if (this.shatteredParent != null && !this.shattered && this.homeX != undefined && this.homeY != undefined) {
-				// 	var currentFrame = this.shatteredParent.getCurrentFrameFromShatteredParent();
-				// 	if (currentFrame != null) {
-				// 		dest.drawImage(currentFrame,this.getWidthInShatteredParent()-this.width/2,this.getHeightInShatteredParent()-this.height/2,this.width,this.height,
-				// 									-this.width/2,-this.height/2,this.width,this.height);
-				// 	}
-				// }
-				// else 
-				if (!this._getShattered()) {
-					var currentFrame = this.getCurrentFrame();
-					if (currentFrame != null) {	
-						dest.drawImage(currentFrame,-this._getWidth()/2,-this._getHeight()/2);
-					}
-				}
-				 
-
-				if (this.showDebugDisplay) {
-					dest.save();
-					dest.strokeStyle = "Green";
-					dest.lineWidth = 1;
-					dest.beginPath();
-					dest.moveTo(0,0);
-					dest.lineTo(0,-this._getHeight()/2);
-					dest.stroke();
-					dest.fillStyle = "Red";
-					dest.fillRect(-4,-4,8,8);
-					dest.beginPath();
-					dest.strokeStyle = "Blue";
-					dest.lineWidth = 1;
-					dest.rect(-this._getWidth()/2,-this._getHeight()/2,this._getWidth(),this._getHeight());
-					dest.stroke();
-					dest.restore();
-				}
-
-				this.children.sort(function(a,b) { return b.z - a.z });
-				for (var i = 0; i < this.children.length; i++) {
-					this.children[i].draw(dest);
-				}
-				
+				dest.strokeStyle = "Green";
+				dest.lineWidth = 1;
+				dest.beginPath();
+				dest.moveTo(0,0);
+				dest.lineTo(0,-this._getHeight()/2);
+				dest.stroke();
+				dest.fillStyle = "Red";
+				dest.fillRect(-4,-4,8,8);
+				dest.beginPath();
+				dest.strokeStyle = "Blue";
+				dest.lineWidth = 1;
+				dest.rect(-this._getWidth()/2,-this._getHeight()/2,this._getWidth(),this._getHeight());
+				dest.stroke();
 				dest.restore();
 			}
-		}
-		catch (err) {
-			LOG.write("error in MovieBlock.draw at: " + drawx + " " + drawy, LOG.ERROR);
-			LOG.writeBlock(this, LOG.ERROR);
-			LOG.writeObject(err, LOG.ERROR);
-			debugger;
+
+			this.children.sort(function(a,b) { return b.z - a.z });
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].draw(dest);
+			}
+			
+			dest.restore();
 		}
 	}
+	catch (err) {
+		LOG.write("error in MovieBlock.draw at: " + drawx + " " + drawy, LOG.ERROR);
+		LOG.writeBlock(this, LOG.ERROR);
+		LOG.writeObject(err, LOG.ERROR);
+		debugger;
+	}
 }
-
-// MovieBlock.prototype.getWidthInShatteredParent = function() {
-// 	if (this.shatteredParent != null) {
-// 		// if (this.homeX == undefined) {
-// 		// 	return this.parent.getWidthInShatteredParent() - this.width/2;
-// 		// }
-// 		// else {
-// 		// 	return this.parent.getWidthInShatteredParent() + this.homeX - this.width/2;
-// 		// }
-// 		return this.shatteredParent.getWidthInShatteredParent() + this.homeX  ;
-// 	}
-// 	else {
-// 		// if (this.homeX == undefined) {
-// 		// 	return -this.width/2;
-// 		// }
-// 		// else {
-// 		// 	return this.homeX - this.width/2;
-// 		// }
-// 		return this.width/2;
-// 	}
-// }
-
-// MovieBlock.prototype.getHeightInShatteredParent = function() {
-// 	if (this.shatteredParent != null) {
-// 		// if (this.homeY == undefined) {
-// 		// 	return this.parent.getHeightInShatteredParent() - this.height/2;
-// 		// }
-// 		// else {
-// 		// 	return this.parent.getHeightInShatteredParent() + this.homeY - this.height/2;
-// 		// }
-// 		return this.shatteredParent.getHeightInShatteredParent() + this.homeY;
-// 	}
-// 	else {
-// 		// if (this.homeY == undefined) {
-// 		// 	return -this.height/2;
-// 		// }
-// 		// else {
-// 		// 	return this.homeY - this.height/2;
-// 		// }
-// 		return this.height/2;
-// 	}
-// }
 
 // Public function
 // Input parameters: red value (0-255), green value (0-255), blue value (0-255), alpha value (0.0-1.0)
@@ -875,9 +631,6 @@ MovieBlock.prototype.destroy = function() {
 	if (this.isMarkedForDestruction) {
 		this.frameAliases.length = 0;
 		this.frameAliases = undefined;
-
-		this.frameData.length = 0;
-		this.frameData = undefined;
 
 		this.frames.length = 0;
 		this.frames = undefined;

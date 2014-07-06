@@ -4,6 +4,34 @@
 		"selected_items":
 		[
 			[
+				"new",
+				"newBlockSize"
+			],
+			[
+				"canvasfr",
+				"canvasFrameIndex"
+			],
+			[
+				"canvasframe",
+				"canvasFrameStack"
+			],
+			[
+				"canvasFra",
+				"canvasFrameIndex"
+			],
+			[
+				"canvasf",
+				"canvasFrame"
+			],
+			[
+				"canvasfram",
+				"canvasFrameIndex"
+			],
+			[
+				"b",
+				"behavior"
+			],
+			[
 				"mouseCLi",
 				"mouseClickEvent"
 			],
@@ -280,10 +308,6 @@
 				"memoryCapacity"
 			],
 			[
-				"new",
-				"newestMemoryIndex"
-			],
-			[
 				"or",
 				"originY"
 			],
@@ -490,81 +514,57 @@
 			[
 				"w",
 				"width"
-			],
-			[
-				"z",
-				"z-index"
-			],
-			[
-				"Cav",
-				"CANVASMANAGER"
-			],
-			[
-				"imgd",
-				"imgDataArrayCopy"
-			],
-			[
-				"bu",
-				"Butterfly1"
-			],
-			[
-				"su",
-				"subscribedFunctions"
-			],
-			[
-				"start",
-				"startUpFunction"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
+			"file": "Source/Block.js",
+			"settings":
+			{
+				"buffer_size": 6196,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Source/ImageTextBlock.js",
+			"settings":
+			{
+				"buffer_size": 13494,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "Source/Utilities.js",
 			"settings":
 			{
-				"buffer_size": 47745,
+				"buffer_size": 35564,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Source/KeyboardEvent.js",
+			"file": "Source/SmokeTestBehaviors.js",
 			"settings":
 			{
-				"buffer_size": 10202,
+				"buffer_size": 35743,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "tempindex.html",
+			"file": "Source/Traits.js",
 			"settings":
 			{
-				"buffer_size": 16914,
+				"buffer_size": 27,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "pg_languagetest.html",
+			"file": "Source/MovieBlock.js",
 			"settings":
 			{
-				"buffer_size": 4241,
+				"buffer_size": 20948,
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Symphori/Google Drive/BlocksV2/Gruntfile.js",
-			"settings":
-			{
-				"buffer_size": 2767,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Symphori/Google Drive/BlocksV2/package.json",
-			"settings":
-			{
-				"buffer_size": 244,
-				"line_ending": "Unix"
 			}
 		}
 	],
@@ -592,9 +592,39 @@
 	},
 	"file_history":
 	[
-		"/C/Users/Symphori/Google Drive/BlocksV2/package.json",
+		"/C/xampp/htdocs/BlocksV2/Source/CinemaBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/DrawingBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/ImageDrawingBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/SoundBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/StereoBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/VideoBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/ShatterTraits.js",
+		"/C/xampp/htdocs/BlocksV2/Source/PlayerTraits.js",
+		"/C/xampp/htdocs/BlocksV2/tests/audio_SpectrogramAmplitudeAvgFreqMagTest.html",
+		"/C/xampp/htdocs/BlocksV2/smoketest_MovieBlock_Shatter.html",
+		"/C/xampp/htdocs/BlocksV2/tempindex2.html",
+		"/C/xampp/htdocs/BlocksV2/Source/MovieBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/ImageParagraphBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/ImageTextBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/CanvasTraits.js",
+		"/C/xampp/htdocs/BlocksV2/Source/Utilities.js",
+		"/C/xampp/htdocs/BlocksV2/Gruntfile.js",
+		"/C/xampp/htdocs/BlocksV2/Source/ActorBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/Block.js",
+		"/C/xampp/htdocs/BlocksV2/smoketest_CinemaBlock_Memory.html",
+		"/C/xampp/htdocs/BlocksV2/Source/SmokeTestBehaviors.js",
+		"/C/xampp/htdocs/BlocksV2/Source/Memory.js",
+		"/C/xampp/htdocs/BlocksV2/Source/Traits.js",
+		"/C/xampp/htdocs/BlocksV2/Source/BlocksJS.js",
+		"/C/xampp/htdocs/BlocksV2/Source/TextBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/ParagraphBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/FragmentBlock.js",
+		"/C/xampp/htdocs/BlocksV2/Source/KeyboardEvent.js",
+		"/C/xampp/htdocs/BlocksV2/Source/CanvasFrame.js",
+		"/C/xampp/htdocs/BlocksV2/Source/CanvasManager.js",
+		"/C/xampp/htdocs/BlocksV2/tempindex.html",
 		"/C/xampp/htdocs/BlocksV2/blankslate.html",
-		"/D/Users/Symphori/Before Crash/My Dreams/Cloud Kingdoms/StoryTimeline.doc",
+		"/C/xampp/htdocs/BlocksV2/pg_languagetest.html",
 		"/C/Users/Symphori/Google Drive/BlocksV2/Source/BlockEvent.js",
 		"/C/Users/Symphori/Google Drive/BlocksV2/Source/Block.js",
 		"/C/Users/Symphori/Google Drive/BlocksV2/smoketest_CinemaBlock_Shatter.html",
@@ -689,8 +719,7 @@
 		"/C/Users/Symphori/Desktop/Blocks/FixedTextBlock",
 		"/C/Users/Symphori/Google Drive/Blocks/Globals.js",
 		"/C/Users/Symphori/Google Drive/Blocks/index.html",
-		"/C/Users/Symphori/Google Drive/Blocks/Block.js",
-		"/C/Users/Symphori/Google Drive/Blocks/Behaviors.js"
+		"/C/Users/Symphori/Google Drive/Blocks/Block.js"
 	],
 	"find":
 	{
@@ -701,6 +730,7 @@
 		"height": 0.0,
 		"where_history":
 		[
+			"<open folders>"
 		]
 	},
 	"find_state":
@@ -708,6 +738,18 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"parse",
+			"createDrawingData",
+			"getFunctionName",
+			"extend",
+			"getCallerFunctionName",
+			"getCallerClassNameFunctionName",
+			"extend",
+			"frameData",
+			"gallery",
+			"remove",
+			"ToChildren",
+			"FromChildren",
 			"keysPressedSubscribedTo",
 			"isSubscribedToMouseMove",
 			"createFrameData",
@@ -760,6 +802,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"COMMON.getFunctionName",
 			"keyboardEvent",
 			"CinemaMaskBlock",
 			"MovieMaskBlock",
@@ -797,23 +840,23 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "Source/Utilities.js",
+					"file": "Source/Block.js",
 					"settings":
 					{
-						"buffer_size": 47745,
+						"buffer_size": 6196,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1233,
+								1233
 							]
 						],
 						"settings":
@@ -822,44 +865,17 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 4581.0,
+						"translation.y": 696.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Source/KeyboardEvent.js",
+					"file": "Source/ImageTextBlock.js",
 					"settings":
 					{
-						"buffer_size": 10202,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								10200,
-								10200
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3999.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "tempindex.html",
-					"settings":
-					{
-						"buffer_size": 16914,
+						"buffer_size": 13494,
 						"regions":
 						{
 						},
@@ -872,48 +888,75 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 519.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "pg_languagetest.html",
+					"buffer": 2,
+					"file": "Source/Utilities.js",
 					"settings":
 					{
-						"buffer_size": 4241,
+						"buffer_size": 35564,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								993,
-								993
+								8076,
+								8076
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 5517.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Source/SmokeTestBehaviors.js",
+					"settings":
+					{
+						"buffer_size": 35743,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								16176,
+								16176
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 9381.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "/C/Users/Symphori/Google Drive/BlocksV2/Gruntfile.js",
+					"file": "Source/Traits.js",
 					"settings":
 					{
-						"buffer_size": 2767,
+						"buffer_size": 27,
 						"regions":
 						{
 						},
@@ -921,14 +964,12 @@
 						[
 							[
 								0,
-								2767
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -938,23 +979,24 @@
 				},
 				{
 					"buffer": 5,
-					"file": "/C/Users/Symphori/Google Drive/BlocksV2/package.json",
+					"file": "Source/MovieBlock.js",
 					"settings":
 					{
-						"buffer_size": 244,
+						"buffer_size": 20948,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								244,
-								244
+								463,
+								463
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,

@@ -7,7 +7,7 @@ var StereoBlock = function() {
 	PARAMS.validateArguments([PARAMS.REST, PARAMS.STRING], arguments);
 
 	LOG.write("SoundBlock constructor called", LOG.VERBOSE);
-	PlayerBlock.call(this);
+	ActorBlock.call(this);
 
 	this.tracks = new Array();
 
@@ -23,7 +23,8 @@ var StereoBlock = function() {
 	this.looping = false;
 }
 
-StereoBlock.prototype = new PlayerBlock();
+StereoBlock.prototype = new ActorBlock();
+StereoBlock.prototype.learn(PlayerTraits);
 
 // Private function
 // Input parameters: none
