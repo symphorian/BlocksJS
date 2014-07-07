@@ -12,6 +12,7 @@ var Log = function() {
 	this.WARN = 2;
 	this.ERROR = 3;
 	this.FATAL = 4;
+	this.SYSTEM = 5;
 	this.NONE = 999;
 }
 
@@ -22,6 +23,7 @@ Log.prototype.setLogThreshold = function(logType) {
 		case this.WARN:
 		case this.ERROR:
 		case this.FATAL:
+		case this.SYSTEM:
 		case this.NONE:
 			this.logThreshold = logType;
 			break;
@@ -69,6 +71,11 @@ Log.prototype.write = function(message, logType) {
 			descriptor += "FATAL: ";
 			break;
 
+		case this.SYSTEM:
+			verifiedType = logType;
+			descriptor += "SYSTEM: ";
+			break;
+
 		default:
 			break;
 	}
@@ -106,6 +113,11 @@ Log.prototype.writeObject = function(obj, logType) {
 			case this.FATAL:
 				verifiedType = logType;
 				descriptor += "FATAL: ";
+				break;
+
+			case this.SYSTEM:
+				verifiedType = logType;
+				descriptor += "SYSTEM: ";
 				break;
 
 			default:
@@ -148,6 +160,11 @@ Log.prototype.writeBlock = function(block, logType, identity) {
 			case this.FATAL:
 				verifiedType = logType;
 				descriptor += "FATAL: ";
+				break;
+
+			case this.SYSTEM:
+				verifiedType = logType;
+				descriptor += "SYSTEM: ";
 				break;
 
 			default:
@@ -274,9 +291,11 @@ KeyCodes.prototype.getKeyCodeFromString = function(keyCodeName) {
 
 KeyCodes.prototype.getKeyCodesFromString = function(keyCodeCombinationName) {
 	var keyCodes = [];
+	var combinationSplit = keyCodeCombinationName.split("|");
 
-	for (var i = 0; i < keyCodeCombinationName.length; i++) {
-		keyCodes[i] = keyCodeCombinationName.charAt(i);
+	for (var i = 0; i < combinationSplit.length; i++) {
+		//keyCodes[i] = keyCodeCombinationName.charAt(i);
+		keyCodes[i] = this.getKeyCodeFromString(combinationSplit[i]);
 	}
 
 	return keyCodes;
@@ -300,6 +319,7 @@ KeyCodes.prototype.getStringFromKeyCodes = function(keyCodes) {
 	for (var i = 0; i < keyCodes.length; i++) {
 		if (filteredKeyCodes.indexOf(keyCodes[i]) == -1) {
 			filteredKeyCodes.push(keyCodes[i]);
+			if (name != "") name += "|";
 			name += this.getStringFromKeyCode(keyCodes[i]);
 		}
 	}

@@ -32,6 +32,10 @@ CanvasFrame.prototype.adoptBlockChild = function(block) {
 	this.masterBlock.adoptChild(block);
 }
 
+CanvasFrame.prototype.destroyBlockChildren = function() {
+	this.masterBlock.destroyChildren();
+}
+
 CanvasFrame.prototype.addBehavior = function(behavior, vars, propagateToChildren) {
 	PARAMS.initializeValidation();
 	behavior = PARAMS.validateParam(PARAMS.FUNCTION, behavior);

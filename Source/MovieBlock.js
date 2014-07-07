@@ -214,6 +214,8 @@ MovieBlock.prototype.undraw = function(dest) {
 MovieBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	if (this.isPlaying) {
 		this.currentFrameIndex++;
 
@@ -656,5 +658,5 @@ MovieBlock.prototype.destroy = function() {
 		this._setShattered(undefined);
 	}
 
-	PlayerBlock.prototype.destroy.call(this);
+	ActorBlock.prototype.destroy.call(this);
 }

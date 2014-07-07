@@ -232,6 +232,13 @@ Block.prototype.draw = function(dest) {
 	}
 };
 
+Block.prototype.destroyChildren = function() {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].destroy();
+	}
+	//this.children.splice(0,this.children.length);
+}
+
 Block.prototype.destroy = function() {
 	if (this.isMarkedForDestruction) {
 		this.identity = undefined;
@@ -264,10 +271,8 @@ Block.prototype.destroy = function() {
 
 		this.visible = undefined;
 
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].destroy();
-		}
-		this.children.splice(0,this.children.length);
+		this.destroyChildren();
+		//this.children.splice(0,this.children.length);
 		//this.children = undefined;
 
 		this.showDebugDisplay = undefined;
@@ -278,5 +283,6 @@ Block.prototype.destroy = function() {
 	}
 	else {
 		this.isMarkedForDestruction = true;
+		this.destroyChildren();
 	}
 }

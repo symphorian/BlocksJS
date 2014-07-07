@@ -36,6 +36,8 @@ var ActorBlock = function () {
 	this.keyDownReactions = new Object();
 	this.keyUpReactions = new Object();
 
+	this.reactionVars = new Object();
+
 	// this.isSubscribedToMouseMove = false;
 	// this.isSubscribedToMouseClick = false;
 	// this.isSubscribedToMouseDown = false;
@@ -464,8 +466,17 @@ ActorBlock.prototype.update = function() {
 
 	Block.prototype.update.call(this);
 
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].update();
+	if (!this.isMarkedForDestruction) {
+		for (var i = 0; i < this.children.length; i++) {
+			var childDestroyed = false;
+			if (this.children[i].isMarkedForDestruction) {
+				childDestroyed = true;
+			}
+			this.children[i].update();
+			if (childDestroyed) {
+				i--;
+			}
+		}
 	}
 
 	// if (this.isMarkedForDestruction) {
@@ -905,7 +916,7 @@ ActorBlock.prototype.addMouseOverReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseOverReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -949,10 +960,10 @@ ActorBlock.prototype.removeMouseOverReaction = function (reaction) {
 
 	if (index > -1) {
 		this.mouseOverReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
@@ -1026,7 +1037,7 @@ ActorBlock.prototype.addMouseOutReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseOutReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -1070,10 +1081,10 @@ ActorBlock.prototype.removeMouseOutReaction = function (reaction) {
 
 	if (index > -1) {
 		this.mouseOutReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
@@ -1147,7 +1158,7 @@ ActorBlock.prototype.addMouseMoveReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseMoveReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -1191,10 +1202,10 @@ ActorBlock.prototype.removeMouseMoveReaction = function (reaction) {
 
 	if (index > -1) {
 		this.mouseMoveReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
@@ -1285,7 +1296,7 @@ ActorBlock.prototype.addMouseClickReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseClickReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -1330,10 +1341,10 @@ ActorBlock.prototype.removeMouseClickReaction = function (reaction) {
 	//var index = this.mouseClickReactions.indexOf(reaction);
 	if (index > -1) {
 		this.mouseClickReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseClickReactions.length == 0) {
@@ -1425,7 +1436,7 @@ ActorBlock.prototype.addMouseDownReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseDownReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -1470,10 +1481,10 @@ ActorBlock.prototype.removeMouseDownReaction = function (reaction) {
 	//var index = this.mouseDownReactions.indexOf(reaction);
 	if (index > -1) {
 		this.mouseDownReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseDownReactions.length == 0) {
@@ -1564,7 +1575,7 @@ ActorBlock.prototype.addMouseUpReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseUpReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -1608,10 +1619,10 @@ ActorBlock.prototype.removeMouseUpReaction = function (reaction) {
 
 	if (index > -1) {
 		this.mouseUpReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseUpReactions.length == 0) {
@@ -1735,7 +1746,7 @@ ActorBlock.prototype.addAnyKeyPressReaction = function(reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyPressReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -1782,10 +1793,10 @@ ActorBlock.prototype.removeAnyKeyPressReaction = function (reaction) {
 
 		if (index > -1) {
 			this.keyPressReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -1858,7 +1869,7 @@ ActorBlock.prototype.addAnyKeyDownReaction = function(reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyDownReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -1905,10 +1916,10 @@ ActorBlock.prototype.removeAnyKeyDownReaction = function (reaction) {
 
 		if (index > -1) {
 			this.keyDownReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -1981,7 +1992,7 @@ ActorBlock.prototype.addAnyKeyUpReaction = function(reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyUpReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -2028,10 +2039,10 @@ ActorBlock.prototype.removeAnyKeyUpReaction = function (reaction) {
 
 		if (index > -1) {
 			this.keyUpReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -2087,7 +2098,7 @@ ActorBlock.prototype.addKeyPressReaction = function(keyCode, reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyPressReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -2136,10 +2147,10 @@ ActorBlock.prototype.removeKeyPressReaction = function (keyCode, reaction) {
 
 		if (index > -1) {
 			this.keyPressReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -2248,7 +2259,7 @@ ActorBlock.prototype.addKeyDownReaction = function(keyCode, reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyDownReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -2297,10 +2308,10 @@ ActorBlock.prototype.removeKeyDownReaction = function (keyCode, reaction) {
 
 		if (index > -1) {
 			this.keyDownReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -2411,7 +2422,7 @@ ActorBlock.prototype.addKeyUpReaction = function(keyCode, reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyUpReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -2460,10 +2471,10 @@ ActorBlock.prototype.removeKeyUpReaction = function (keyCode, reaction) {
 
 		if (index > -1) {
 			this.keyUpReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -2573,7 +2584,7 @@ ActorBlock.prototype.addKeyCombinationReaction = function(keyCodes, reaction, va
 		boundReaction.reactionName = reactionName;
 		this.keyDownReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -2623,10 +2634,10 @@ ActorBlock.prototype.removeKeyCombinationReaction = function (keyCodes, reaction
 
 		if (index > -1) {
 			this.keyDownReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -2655,7 +2666,7 @@ ActorBlock.prototype.removeAllKeyCombinationReactionsForKeyCodes = function (key
 	PARAMS.initializeValidation();
 	keyCodes = PARAMS.validateParam(PARAMS.ARRAYOFINTEGER, keyCodes);
 
-	var name = KEYCODES.getStringFromKeyCode(keyCodes);
+	var name = KEYCODES.getStringFromKeyCodes(keyCodes);
 
 	while (this.keyDownReactions[name].length > 0) {
 		this.removeKeyCombinationReaction(keyCodes, this.keyDownReactions[name][0]);
@@ -2683,7 +2694,7 @@ ActorBlock.prototype.removeAllKeyCombinationReactionsForKeyCodesFromChildren = f
 // Example: myblockCluster.removeAllKeyCombinationReactions();
 ActorBlock.prototype.removeAllKeyCombinationReactions = function () {
 	for (var keyCodeName in this.keyDownReactions) {
-		if (keyCodeName.length > 1) {
+		if (keyCodeName.indexOf("|") > -1) {
 			this.removeAllKeyCombinationReactionsForKeyCodes(KEYCODES.getKeyCodesFromString(keyCodeName));
 		}
 	}
@@ -2778,6 +2789,8 @@ ActorBlock.prototype.destroy = function() {
 		this.keyPressReactions = undefined;
 		this.keyDownReactions = undefined;
 		this.keyUpReactions = undefined;
+
+		this.reactionVars = undefined;
 
 		CANVASMANAGER.mouseMoveEvent.unsubscribe(this);
 		CANVASMANAGER.mouseClickEvent.unsubscribe(this);

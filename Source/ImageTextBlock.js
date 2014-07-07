@@ -311,6 +311,8 @@ ImageTextBlock.prototype.undraw = function(dest) {
 ImageTextBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	this._setText(this.text);
 	this._setFont(this.font);
 	this._setSize(this.size);

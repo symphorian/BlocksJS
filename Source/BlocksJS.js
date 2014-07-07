@@ -12,6 +12,7 @@ var Log = function() {
 	this.WARN = 2;
 	this.ERROR = 3;
 	this.FATAL = 4;
+	this.SYSTEM = 5;
 	this.NONE = 999;
 }
 
@@ -22,6 +23,7 @@ Log.prototype.setLogThreshold = function(logType) {
 		case this.WARN:
 		case this.ERROR:
 		case this.FATAL:
+		case this.SYSTEM:
 		case this.NONE:
 			this.logThreshold = logType;
 			break;
@@ -69,6 +71,11 @@ Log.prototype.write = function(message, logType) {
 			descriptor += "FATAL: ";
 			break;
 
+		case this.SYSTEM:
+			verifiedType = logType;
+			descriptor += "SYSTEM: ";
+			break;
+
 		default:
 			break;
 	}
@@ -106,6 +113,11 @@ Log.prototype.writeObject = function(obj, logType) {
 			case this.FATAL:
 				verifiedType = logType;
 				descriptor += "FATAL: ";
+				break;
+
+			case this.SYSTEM:
+				verifiedType = logType;
+				descriptor += "SYSTEM: ";
 				break;
 
 			default:
@@ -148,6 +160,11 @@ Log.prototype.writeBlock = function(block, logType, identity) {
 			case this.FATAL:
 				verifiedType = logType;
 				descriptor += "FATAL: ";
+				break;
+
+			case this.SYSTEM:
+				verifiedType = logType;
+				descriptor += "SYSTEM: ";
 				break;
 
 			default:
@@ -274,9 +291,11 @@ KeyCodes.prototype.getKeyCodeFromString = function(keyCodeName) {
 
 KeyCodes.prototype.getKeyCodesFromString = function(keyCodeCombinationName) {
 	var keyCodes = [];
+	var combinationSplit = keyCodeCombinationName.split("|");
 
-	for (var i = 0; i < keyCodeCombinationName.length; i++) {
-		keyCodes[i] = keyCodeCombinationName.charAt(i);
+	for (var i = 0; i < combinationSplit.length; i++) {
+		//keyCodes[i] = keyCodeCombinationName.charAt(i);
+		keyCodes[i] = this.getKeyCodeFromString(combinationSplit[i]);
 	}
 
 	return keyCodes;
@@ -300,6 +319,7 @@ KeyCodes.prototype.getStringFromKeyCodes = function(keyCodes) {
 	for (var i = 0; i < keyCodes.length; i++) {
 		if (filteredKeyCodes.indexOf(keyCodes[i]) == -1) {
 			filteredKeyCodes.push(keyCodes[i]);
+			if (name != "") name += "|";
 			name += this.getStringFromKeyCode(keyCodes[i]);
 		}
 	}
@@ -1287,6 +1307,7 @@ var AudioTrack = function() {
 	this.audio = document.createElement("audio");
 	this.name = "";
 	this.onload = null;
+	this.onloadEventListenerAdded = false;
 }
 
 // Public function
@@ -1311,7 +1332,10 @@ AudioTrack.prototype.setName = function(alias) {
 // Returns: none
 // Description: sets the alias associated to the audio object
 AudioTrack.prototype.load = function(filename) {
-	this.audio.addEventListener("canplaythrough", this.onload);
+	if (!this.onloadEventListenerAdded) {
+		this.audio.addEventListener("canplaythrough", this.onload);
+		this.onloadEventListenerAdded = true;
+	}
 	this.audio.src = filename;
 	this.audio.load();
 }
@@ -1387,6 +1411,21 @@ AudioTrack.prototype.setVolume = function(percent) {
 // Description: sets whether or not the track should loop
 AudioTrack.prototype.setLooping = function(shouldLoop) {
 	this.audio.loop = shouldLoop;
+}
+
+AudioTrack.prototype.destroy = function() {
+	if (this.audio) { 
+		this.audio.pause();
+		if (this.onload) {
+			this.audio.removeEventListener("canplaythrough", this.onload);
+		}
+		delete(this.audio);
+		this.audio = undefined;
+	}
+
+	this.name = undefined;
+	this.onload = undefined;
+	this.onloadEventListenerAdded = undefined;
 }
 // Public Constructor function
 // Input parameter(s):  none
@@ -1557,7 +1596,7 @@ Video.prototype.destroy = function() {
 	if (this.video) { 
 		this.video.pause();
 		if (this.onloadEventListenerAdded) {
-			this.video.removeEventListener("canplaythrough", this.onload);
+			this.video.removeEventListener("canplaythrough", this.onloadEventListenerAdded);
 		}
 		delete(this.video);
 		this.video = undefined;
@@ -1729,7 +1768,7 @@ KeyboardEvent.prototype.fireEvent = function(keyCode, eventType) {
 
 				if (this.keyDownSubscribedBlocks[combinationName] != undefined) {
 					for (var i = 0; i < this.keyDownSubscribedBlocks[combinationName].length; i++) {
-						this.keyDownSubscribedBlocks[combinationName][i]["reactTo" + this.KEYDOWNEVENT](this,name);
+						this.keyDownSubscribedBlocks[combinationName][i]["reactTo" + this.KEYDOWNEVENT](this,combinationName);
 					}
 				}
 				
@@ -2036,12 +2075,18 @@ var AssetManager = function() {
 	this.videoAssetsLoadedEvent = new Event();
 	this.assetsLoadedEvent = new Event();
 
+	this.loading = false;
 }
 
 AssetManager.prototype.tryToFireAssetsLoadedEvent = function () {
-	if (this.imageAssetsFound < 0 || (this.imageAssetsFound > 0 && this.imageAssetsFound == this.imageAssetsLoaded) &&
-		this.audioAssetsFound < 0 || (this.audioAssetsFound > 0 && this.audioAssetsFound == this.audioAssetsLoaded) &&
-		this.videoAssetsFound < 0 || (this.videoAssetsFound > 0 && this.videoAssetsFound == this.videoAssetsLoaded)) {
+	LOG.write("imageAssetsFound:" + this.imageAssetsFound + ", imageAssetsLoaded:" + this.imageAssetsLoaded, LOG.SYSTEM);
+	LOG.write("audioAssetsFound:" + this.audioAssetsFound + ", audioAssetsLoaded:" + this.audioAssetsLoaded, LOG.SYSTEM);
+	LOG.write("videoAssetsFound:" + this.videoAssetsFound + ", videoAssetsLoaded:" + this.videoAssetsLoaded, LOG.SYSTEM);
+	if ((this.imageAssetsFound < 0 || (this.imageAssetsFound > 0 && this.imageAssetsFound == this.imageAssetsLoaded)) &&
+		(this.audioAssetsFound < 0 || (this.audioAssetsFound > 0 && this.audioAssetsFound == this.audioAssetsLoaded)) &&
+		(this.videoAssetsFound < 0 || (this.videoAssetsFound > 0 && this.videoAssetsFound == this.videoAssetsLoaded))) {
+		LOG.write("All assets loaded; firing assetsLoadedEvent...", LOG.SYSTEM);
+		this.loading = false;
 		this.assetsLoadedEvent.fireEvent();
 	}
 }
@@ -2214,44 +2259,82 @@ AssetManager.prototype.loadAssets = function(imageXMLfilename, audioXMLfilename,
 	audioXMLfilename = PARAMS.validateParam(PARAMS.STRING, audioXMLfilename, null);
 	videoXMLfilename = PARAMS.validateParam(PARAMS.STRING, videoXMLfilename, null);
 
-	if (imageXMLfilename == null) {
-		this.imageAssetsFound = -1;
-		this.imageAssetsLoaded = -1;
+	if (!this.loading) {
+		LOG.write("Beginning to load assets...", LOG.SYSTEM);
+
+		if (imageXMLfilename) {
+			this.imageAssetsFound = 0;
+			this.imageAssetsLoaded = 0;
+		}
+		else {
+			this.imageAssetsFound = -1;
+			this.imageAssetsLoaded = -1;
+		}
+
+		if (audioXMLfilename) {
+			this.audioAssetsFound = 0;
+			this.audioAssetsLoaded = 0;
+		}
+		else {
+			this.audioAssetsFound = -1;
+			this.audioAssetsLoaded = -1;
+		}
+
+		if (videoXMLfilename) {
+			this.videoAssetsFound = 0;
+			this.videoAssetsLoaded = 0;
+		}
+		else {
+			this.videoAssetsFound = -1;
+			this.videoAssetsLoaded = -1;
+		}
+
+		if (this.imageAssetsFound == 0) {
+			this.loading = true;
+			this.loadImageAssetXML(imageXMLfilename);
+		}
+
+		if (this.audioAssetsFound == 0) {
+			this.loading = true;
+			this.loadAudioAssetXML(audioXMLfilename);
+		}
+
+		if (this.videoAssetsFound == 0) {
+			this.loading = true;
+			this.loadVideoAssetXML(videoXMLfilename);
+		}
 	}
-	else {
-		this.imageAssetsFound = 0;
-		this.imageAssetsLoaded = 0;
+}
+
+AssetManager.prototype.unloadAssets = function() {
+	LOG.write("Beginning to unload assets...", LOG.SYSTEM);
+	for (var img in this.imageAssets) {
+		delete(this.imageAssets[img]);
+		this.imageAssets[img] = undefined;
 	}
 
-	if (audioXMLfilename == null) {
-		this.audioAssetsFound = -1;
-		this.audioAssetsLoaded = -1;
-	}
-	else {
-		this.audioAssetsFound = 0;
-		this.audioAssetsLoaded = 0;
+	for (var audio in this.audioAssets) {
+		this.audioAssets[audio].destroy();
+		this.audioAssets[audio] = undefined;
 	}
 
-	if (videoXMLfilename == null) {
-		this.videoAssetsFound = -1;
-		this.videoAssetsLoaded = -1;
-	}
-	else {
-		this.videoAssetsFound = 0;
-		this.videoAssetsLoaded = 0;
+	for (var video in this.videoAssets) {
+		this.videoAssets[video].destroy();
+		this.videoAssets[video] = undefined;
 	}
 
-	if (this.imageAssetsFound == 0) {
-		this.loadImageAssetXML(imageXMLfilename);
-	}
+	this.imageAssetsFound = -1;
+	this.imageAssetsLoaded = -1;
 
-	if (this.audioAssetsFound == 0) {
-		this.loadAudioAssetXML(audioXMLfilename);
-	}
+	this.audioAssetsFound = -1;
+	this.audioAssetsLoaded = -1;
 
-	if (this.videoAssetsFound == 0) {
-		this.loadVideoAssetXML(videoXMLfilename);
-	}
+	this.videoAssetsFound = -1;
+	this.videoAssetsLoaded = -1;
+
+	this.loading = false;
+
+	LOG.write("All assets unloaded.", LOG.SYSTEM);
 }
 var Block = function () {
 	this.identity = null;
@@ -2487,6 +2570,13 @@ Block.prototype.draw = function(dest) {
 	}
 };
 
+Block.prototype.destroyChildren = function() {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].destroy();
+	}
+	//this.children.splice(0,this.children.length);
+}
+
 Block.prototype.destroy = function() {
 	if (this.isMarkedForDestruction) {
 		this.identity = undefined;
@@ -2519,10 +2609,8 @@ Block.prototype.destroy = function() {
 
 		this.visible = undefined;
 
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].destroy();
-		}
-		this.children.splice(0,this.children.length);
+		this.destroyChildren();
+		//this.children.splice(0,this.children.length);
 		//this.children = undefined;
 
 		this.showDebugDisplay = undefined;
@@ -2533,6 +2621,7 @@ Block.prototype.destroy = function() {
 	}
 	else {
 		this.isMarkedForDestruction = true;
+		this.destroyChildren();
 	}
 }
 // Public Constructor function
@@ -2572,6 +2661,8 @@ var ActorBlock = function () {
 	this.keyPressReactions = new Object();
 	this.keyDownReactions = new Object();
 	this.keyUpReactions = new Object();
+
+	this.reactionVars = new Object();
 
 	// this.isSubscribedToMouseMove = false;
 	// this.isSubscribedToMouseClick = false;
@@ -3001,8 +3092,17 @@ ActorBlock.prototype.update = function() {
 
 	Block.prototype.update.call(this);
 
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].update();
+	if (!this.isMarkedForDestruction) {
+		for (var i = 0; i < this.children.length; i++) {
+			var childDestroyed = false;
+			if (this.children[i].isMarkedForDestruction) {
+				childDestroyed = true;
+			}
+			this.children[i].update();
+			if (childDestroyed) {
+				i--;
+			}
+		}
 	}
 
 	// if (this.isMarkedForDestruction) {
@@ -3442,7 +3542,7 @@ ActorBlock.prototype.addMouseOverReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseOverReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -3486,10 +3586,10 @@ ActorBlock.prototype.removeMouseOverReaction = function (reaction) {
 
 	if (index > -1) {
 		this.mouseOverReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
@@ -3563,7 +3663,7 @@ ActorBlock.prototype.addMouseOutReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseOutReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -3607,10 +3707,10 @@ ActorBlock.prototype.removeMouseOutReaction = function (reaction) {
 
 	if (index > -1) {
 		this.mouseOutReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
@@ -3684,7 +3784,7 @@ ActorBlock.prototype.addMouseMoveReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseMoveReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -3728,10 +3828,10 @@ ActorBlock.prototype.removeMouseMoveReaction = function (reaction) {
 
 	if (index > -1) {
 		this.mouseMoveReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseOverReactions.length == 0 && this.mouseOutReactions.length == 0 && this.mouseMoveReactions.length == 0) {
@@ -3822,7 +3922,7 @@ ActorBlock.prototype.addMouseClickReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseClickReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -3867,10 +3967,10 @@ ActorBlock.prototype.removeMouseClickReaction = function (reaction) {
 	//var index = this.mouseClickReactions.indexOf(reaction);
 	if (index > -1) {
 		this.mouseClickReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseClickReactions.length == 0) {
@@ -3962,7 +4062,7 @@ ActorBlock.prototype.addMouseDownReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseDownReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -4007,10 +4107,10 @@ ActorBlock.prototype.removeMouseDownReaction = function (reaction) {
 	//var index = this.mouseDownReactions.indexOf(reaction);
 	if (index > -1) {
 		this.mouseDownReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseDownReactions.length == 0) {
@@ -4101,7 +4201,7 @@ ActorBlock.prototype.addMouseUpReaction = function (reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.mouseUpReactions.push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -4145,10 +4245,10 @@ ActorBlock.prototype.removeMouseUpReaction = function (reaction) {
 
 	if (index > -1) {
 		this.mouseUpReactions.splice(index,1);
-		for (var innerProp in this.behaviorVars[reactionName]) {
-			delete this.behaviorVars[reactionName][innerProp];
+		for (var innerProp in this.reactionVars[reactionName]) {
+			delete this.reactionVars[reactionName][innerProp];
 		}
-		delete this.behaviorVars[reactionName];
+		delete this.reactionVars[reactionName];
 	}
 
 	if (this.mouseUpReactions.length == 0) {
@@ -4272,7 +4372,7 @@ ActorBlock.prototype.addAnyKeyPressReaction = function(reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyPressReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -4319,10 +4419,10 @@ ActorBlock.prototype.removeAnyKeyPressReaction = function (reaction) {
 
 		if (index > -1) {
 			this.keyPressReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -4395,7 +4495,7 @@ ActorBlock.prototype.addAnyKeyDownReaction = function(reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyDownReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -4442,10 +4542,10 @@ ActorBlock.prototype.removeAnyKeyDownReaction = function (reaction) {
 
 		if (index > -1) {
 			this.keyDownReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -4518,7 +4618,7 @@ ActorBlock.prototype.addAnyKeyUpReaction = function(reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyUpReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -4565,10 +4665,10 @@ ActorBlock.prototype.removeAnyKeyUpReaction = function (reaction) {
 
 		if (index > -1) {
 			this.keyUpReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -4624,7 +4724,7 @@ ActorBlock.prototype.addKeyPressReaction = function(keyCode, reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyPressReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -4673,10 +4773,10 @@ ActorBlock.prototype.removeKeyPressReaction = function (keyCode, reaction) {
 
 		if (index > -1) {
 			this.keyPressReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -4785,7 +4885,7 @@ ActorBlock.prototype.addKeyDownReaction = function(keyCode, reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyDownReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -4834,10 +4934,10 @@ ActorBlock.prototype.removeKeyDownReaction = function (keyCode, reaction) {
 
 		if (index > -1) {
 			this.keyDownReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -4948,7 +5048,7 @@ ActorBlock.prototype.addKeyUpReaction = function(keyCode, reaction, vars) {
 		boundReaction.reactionName = reactionName;
 		this.keyUpReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -4997,10 +5097,10 @@ ActorBlock.prototype.removeKeyUpReaction = function (keyCode, reaction) {
 
 		if (index > -1) {
 			this.keyUpReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -5110,7 +5210,7 @@ ActorBlock.prototype.addKeyCombinationReaction = function(keyCodes, reaction, va
 		boundReaction.reactionName = reactionName;
 		this.keyDownReactions[name].push(boundReaction);
 		if (vars != undefined) {
-			this.behaviorVars[reactionName] = vars;
+			this.reactionVars[reactionName] = vars;
 		}
 	}
 }
@@ -5160,10 +5260,10 @@ ActorBlock.prototype.removeKeyCombinationReaction = function (keyCodes, reaction
 
 		if (index > -1) {
 			this.keyDownReactions[name].splice(index,1);
-			for (var innerProp in this.behaviorVars[reactionName]) {
-				delete this.behaviorVars[reactionName][innerProp];
+			for (var innerProp in this.reactionVars[reactionName]) {
+				delete this.reactionVars[reactionName][innerProp];
 			}
-			delete this.behaviorVars[reactionName];
+			delete this.reactionVars[reactionName];
 		}
 	}
 }
@@ -5192,7 +5292,7 @@ ActorBlock.prototype.removeAllKeyCombinationReactionsForKeyCodes = function (key
 	PARAMS.initializeValidation();
 	keyCodes = PARAMS.validateParam(PARAMS.ARRAYOFINTEGER, keyCodes);
 
-	var name = KEYCODES.getStringFromKeyCode(keyCodes);
+	var name = KEYCODES.getStringFromKeyCodes(keyCodes);
 
 	while (this.keyDownReactions[name].length > 0) {
 		this.removeKeyCombinationReaction(keyCodes, this.keyDownReactions[name][0]);
@@ -5220,7 +5320,7 @@ ActorBlock.prototype.removeAllKeyCombinationReactionsForKeyCodesFromChildren = f
 // Example: myblockCluster.removeAllKeyCombinationReactions();
 ActorBlock.prototype.removeAllKeyCombinationReactions = function () {
 	for (var keyCodeName in this.keyDownReactions) {
-		if (keyCodeName.length > 1) {
+		if (keyCodeName.indexOf("|") > -1) {
 			this.removeAllKeyCombinationReactionsForKeyCodes(KEYCODES.getKeyCodesFromString(keyCodeName));
 		}
 	}
@@ -5315,6 +5415,8 @@ ActorBlock.prototype.destroy = function() {
 		this.keyPressReactions = undefined;
 		this.keyDownReactions = undefined;
 		this.keyUpReactions = undefined;
+
+		this.reactionVars = undefined;
 
 		CANVASMANAGER.mouseMoveEvent.unsubscribe(this);
 		CANVASMANAGER.mouseClickEvent.unsubscribe(this);
@@ -6125,6 +6227,8 @@ FragmentBlock.prototype.undraw = function(dest) {
 FragmentBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	this._setHomeX(this.homeX);
 	this._setHomeY(this.homeY);
 	this._setHomeZ(this.homeZ);
@@ -6795,6 +6899,8 @@ MovieBlock.prototype.undraw = function(dest) {
 MovieBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	if (this.isPlaying) {
 		this.currentFrameIndex++;
 
@@ -7237,7 +7343,7 @@ MovieBlock.prototype.destroy = function() {
 		this._setShattered(undefined);
 	}
 
-	PlayerBlock.prototype.destroy.call(this);
+	ActorBlock.prototype.destroy.call(this);
 }
 // Public Constructor function
 // Input parameter(s):  movie name string, array of image aliases, movie name string, array of image aliases, ...
@@ -7514,6 +7620,8 @@ CinemaBlock.prototype.undraw = function(dest) {
 // handles frame updates and filter/mask application
 CinemaBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
+
+	if (this.isMarkedForDestruction) return;
 
 	if (this.isPlaying) {
 		this.currentFrameIndex++;
@@ -8299,7 +8407,7 @@ CinemaBlock.prototype.destroy = function() {
 	this.shattered = undefined;
 	this._setShattered(undefined);
 
-	PlayerBlock.prototype.destroy.call(this);
+	ActorBlock.prototype.destroy.call(this);
 }
 // Public Constructor function
 // Input parameter(s):  text (string), font name (string)(default:Verdana), 
@@ -8567,6 +8675,8 @@ TextBlock.prototype.undraw = function(dest) {
 // handles text and font updates
 TextBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
+
+	if (this.isMarkedForDestruction) return;
 
 	this._setText(this.text);
 	this._setFont(this.font);
@@ -9025,6 +9135,8 @@ ImageTextBlock.prototype.undraw = function(dest) {
 ImageTextBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	this._setText(this.text);
 	this._setFont(this.font);
 	this._setSize(this.size);
@@ -9418,6 +9530,8 @@ ParagraphBlock.prototype.undraw = function(dest) {
 // handles text and font updates
 ParagraphBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
+
+	if (this.isMarkedForDestruction) return;
 
 	this._setText(this.text);
 	this._setFont(this.font);
@@ -9997,6 +10111,8 @@ ImageParagraphBlock.prototype.undraw = function(dest) {
 ImageParagraphBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	this._setText(this.text);
 	this._setFont(this.font);
 	this._setSize(this.size);
@@ -10520,6 +10636,8 @@ VideoBlock.prototype.undraw = function(dest) {
 VideoBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	this._setVideo(this.video);
 	this._setShattered(this.shattered);
 }
@@ -10606,7 +10724,7 @@ VideoBlock.prototype.destroy = function() {
 		this._setShattered(undefined);
 	}
 
-	PlayerBlock.prototype.destroy.call(this);
+	ActorBlock.prototype.destroy.call(this);
 }
 // Public Constructor function
 // Input parameter(s):  
@@ -10930,6 +11048,8 @@ DrawingBlock.prototype.undraw = function(dest) {
 // handles text and font updates
 DrawingBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
+
+	if (this.isMarkedForDestruction) return;
 }
 
 // Private function
@@ -11350,6 +11470,8 @@ ImageDrawingBlock.prototype.undraw = function(dest) {
 ImageDrawingBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	if (this.hasChangedFromLatestMemory(true)) {
 		this.createDrawingData();
 	}
@@ -11475,6 +11597,10 @@ CanvasFrame.prototype.adoptBlockChild = function(block) {
 	block = PARAMS.validateParam(PARAMS.ACTORBLOCK, block);
 
 	this.masterBlock.adoptChild(block);
+}
+
+CanvasFrame.prototype.destroyBlockChildren = function() {
+	this.masterBlock.destroyChildren();
 }
 
 CanvasFrame.prototype.addBehavior = function(behavior, vars, propagateToChildren) {
@@ -11812,6 +11938,21 @@ CanvasManager.prototype.adoptBlockChild = function(block, canvasFrameIndex) {
 	this.canvasFrameStack[canvasFrameIndex].adoptBlockChild(block);
 }
 
+CanvasManager.prototype.destroyBlockChildren = function(canvasFrameIndex) {
+	PARAMS.initializeValidation();
+	canvasFrameIndex = PARAMS.validateParam(PARAMS.INTEGER, canvasFrameIndex);
+
+	if (this.canvasFrameStack[canvasFrameIndex]) {
+		this.canvasFrameStack[canvasFrameIndex].destroyBlockChildren();
+	}
+}
+
+CanvasManager.prototype.destroyAllBlockChildren = function() {
+	for (var i = 0; i < this.canvasFrameStack.length; i++) {
+		this.canvasFrameStack[i].destroyBlockChildren();
+	}
+}
+
 CanvasManager.prototype.refreshAll = function() {
 	this.mouseMoveEvent.fireEvent();
 	for (var i = 0; i < this.canvasFrameStack.length; i++) {
@@ -11850,6 +11991,10 @@ CanvasManager.prototype.showErrorMessages = function() {
 
 CanvasManager.prototype.showFatalMessages = function() {
 	LOG.setLogThreshold(LOG.FATAL);
+}
+
+CanvasManager.prototype.showSystemMessages = function() {
+	LOG.setLogThreshold(LOG.SYSTEM);
 }
 
 CanvasManager.prototype.showNoMessages = function() {

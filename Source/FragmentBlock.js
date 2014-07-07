@@ -205,6 +205,8 @@ FragmentBlock.prototype.undraw = function(dest) {
 FragmentBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	this._setHomeX(this.homeX);
 	this._setHomeY(this.homeY);
 	this._setHomeZ(this.homeZ);

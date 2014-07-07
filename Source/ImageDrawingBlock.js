@@ -332,6 +332,8 @@ ImageDrawingBlock.prototype.undraw = function(dest) {
 ImageDrawingBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	if (this.hasChangedFromLatestMemory(true)) {
 		this.createDrawingData();
 	}

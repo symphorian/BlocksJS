@@ -7,6 +7,7 @@ var AudioTrack = function() {
 	this.audio = document.createElement("audio");
 	this.name = "";
 	this.onload = null;
+	this.onloadEventListenerAdded = false;
 }
 
 // Public function
@@ -31,7 +32,10 @@ AudioTrack.prototype.setName = function(alias) {
 // Returns: none
 // Description: sets the alias associated to the audio object
 AudioTrack.prototype.load = function(filename) {
-	this.audio.addEventListener("canplaythrough", this.onload);
+	if (!this.onloadEventListenerAdded) {
+		this.audio.addEventListener("canplaythrough", this.onload);
+		this.onloadEventListenerAdded = true;
+	}
 	this.audio.src = filename;
 	this.audio.load();
 }
@@ -107,4 +111,19 @@ AudioTrack.prototype.setVolume = function(percent) {
 // Description: sets whether or not the track should loop
 AudioTrack.prototype.setLooping = function(shouldLoop) {
 	this.audio.loop = shouldLoop;
+}
+
+AudioTrack.prototype.destroy = function() {
+	if (this.audio) { 
+		this.audio.pause();
+		if (this.onload) {
+			this.audio.removeEventListener("canplaythrough", this.onload);
+		}
+		delete(this.audio);
+		this.audio = undefined;
+	}
+
+	this.name = undefined;
+	this.onload = undefined;
+	this.onloadEventListenerAdded = undefined;
 }

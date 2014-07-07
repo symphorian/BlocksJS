@@ -320,6 +320,8 @@ DrawingBlock.prototype.undraw = function(dest) {
 // handles text and font updates
 DrawingBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
+
+	if (this.isMarkedForDestruction) return;
 }
 
 // Private function

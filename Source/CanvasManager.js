@@ -206,6 +206,21 @@ CanvasManager.prototype.adoptBlockChild = function(block, canvasFrameIndex) {
 	this.canvasFrameStack[canvasFrameIndex].adoptBlockChild(block);
 }
 
+CanvasManager.prototype.destroyBlockChildren = function(canvasFrameIndex) {
+	PARAMS.initializeValidation();
+	canvasFrameIndex = PARAMS.validateParam(PARAMS.INTEGER, canvasFrameIndex);
+
+	if (this.canvasFrameStack[canvasFrameIndex]) {
+		this.canvasFrameStack[canvasFrameIndex].destroyBlockChildren();
+	}
+}
+
+CanvasManager.prototype.destroyAllBlockChildren = function() {
+	for (var i = 0; i < this.canvasFrameStack.length; i++) {
+		this.canvasFrameStack[i].destroyBlockChildren();
+	}
+}
+
 CanvasManager.prototype.refreshAll = function() {
 	this.mouseMoveEvent.fireEvent();
 	for (var i = 0; i < this.canvasFrameStack.length; i++) {
@@ -244,6 +259,10 @@ CanvasManager.prototype.showErrorMessages = function() {
 
 CanvasManager.prototype.showFatalMessages = function() {
 	LOG.setLogThreshold(LOG.FATAL);
+}
+
+CanvasManager.prototype.showSystemMessages = function() {
+	LOG.setLogThreshold(LOG.SYSTEM);
 }
 
 CanvasManager.prototype.showNoMessages = function() {

@@ -42,7 +42,7 @@ KeyboardEvent.prototype.fireEvent = function(keyCode, eventType) {
 
 				if (this.keyDownSubscribedBlocks[combinationName] != undefined) {
 					for (var i = 0; i < this.keyDownSubscribedBlocks[combinationName].length; i++) {
-						this.keyDownSubscribedBlocks[combinationName][i]["reactTo" + this.KEYDOWNEVENT](this,name);
+						this.keyDownSubscribedBlocks[combinationName][i]["reactTo" + this.KEYDOWNEVENT](this,combinationName);
 					}
 				}
 				

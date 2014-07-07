@@ -167,7 +167,7 @@ Video.prototype.destroy = function() {
 	if (this.video) { 
 		this.video.pause();
 		if (this.onloadEventListenerAdded) {
-			this.video.removeEventListener("canplaythrough", this.onload);
+			this.video.removeEventListener("canplaythrough", this.onloadEventListenerAdded);
 		}
 		delete(this.video);
 		this.video = undefined;

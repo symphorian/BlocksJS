@@ -20,12 +20,18 @@ var AssetManager = function() {
 	this.videoAssetsLoadedEvent = new Event();
 	this.assetsLoadedEvent = new Event();
 
+	this.loading = false;
 }
 
 AssetManager.prototype.tryToFireAssetsLoadedEvent = function () {
-	if (this.imageAssetsFound < 0 || (this.imageAssetsFound > 0 && this.imageAssetsFound == this.imageAssetsLoaded) &&
-		this.audioAssetsFound < 0 || (this.audioAssetsFound > 0 && this.audioAssetsFound == this.audioAssetsLoaded) &&
-		this.videoAssetsFound < 0 || (this.videoAssetsFound > 0 && this.videoAssetsFound == this.videoAssetsLoaded)) {
+	LOG.write("imageAssetsFound:" + this.imageAssetsFound + ", imageAssetsLoaded:" + this.imageAssetsLoaded, LOG.SYSTEM);
+	LOG.write("audioAssetsFound:" + this.audioAssetsFound + ", audioAssetsLoaded:" + this.audioAssetsLoaded, LOG.SYSTEM);
+	LOG.write("videoAssetsFound:" + this.videoAssetsFound + ", videoAssetsLoaded:" + this.videoAssetsLoaded, LOG.SYSTEM);
+	if ((this.imageAssetsFound < 0 || (this.imageAssetsFound > 0 && this.imageAssetsFound == this.imageAssetsLoaded)) &&
+		(this.audioAssetsFound < 0 || (this.audioAssetsFound > 0 && this.audioAssetsFound == this.audioAssetsLoaded)) &&
+		(this.videoAssetsFound < 0 || (this.videoAssetsFound > 0 && this.videoAssetsFound == this.videoAssetsLoaded))) {
+		LOG.write("All assets loaded; firing assetsLoadedEvent...", LOG.SYSTEM);
+		this.loading = false;
 		this.assetsLoadedEvent.fireEvent();
 	}
 }
@@ -198,42 +204,80 @@ AssetManager.prototype.loadAssets = function(imageXMLfilename, audioXMLfilename,
 	audioXMLfilename = PARAMS.validateParam(PARAMS.STRING, audioXMLfilename, null);
 	videoXMLfilename = PARAMS.validateParam(PARAMS.STRING, videoXMLfilename, null);
 
-	if (imageXMLfilename == null) {
-		this.imageAssetsFound = -1;
-		this.imageAssetsLoaded = -1;
+	if (!this.loading) {
+		LOG.write("Beginning to load assets...", LOG.SYSTEM);
+
+		if (imageXMLfilename) {
+			this.imageAssetsFound = 0;
+			this.imageAssetsLoaded = 0;
+		}
+		else {
+			this.imageAssetsFound = -1;
+			this.imageAssetsLoaded = -1;
+		}
+
+		if (audioXMLfilename) {
+			this.audioAssetsFound = 0;
+			this.audioAssetsLoaded = 0;
+		}
+		else {
+			this.audioAssetsFound = -1;
+			this.audioAssetsLoaded = -1;
+		}
+
+		if (videoXMLfilename) {
+			this.videoAssetsFound = 0;
+			this.videoAssetsLoaded = 0;
+		}
+		else {
+			this.videoAssetsFound = -1;
+			this.videoAssetsLoaded = -1;
+		}
+
+		if (this.imageAssetsFound == 0) {
+			this.loading = true;
+			this.loadImageAssetXML(imageXMLfilename);
+		}
+
+		if (this.audioAssetsFound == 0) {
+			this.loading = true;
+			this.loadAudioAssetXML(audioXMLfilename);
+		}
+
+		if (this.videoAssetsFound == 0) {
+			this.loading = true;
+			this.loadVideoAssetXML(videoXMLfilename);
+		}
 	}
-	else {
-		this.imageAssetsFound = 0;
-		this.imageAssetsLoaded = 0;
+}
+
+AssetManager.prototype.unloadAssets = function() {
+	LOG.write("Beginning to unload assets...", LOG.SYSTEM);
+	for (var img in this.imageAssets) {
+		delete(this.imageAssets[img]);
+		this.imageAssets[img] = undefined;
 	}
 
-	if (audioXMLfilename == null) {
-		this.audioAssetsFound = -1;
-		this.audioAssetsLoaded = -1;
-	}
-	else {
-		this.audioAssetsFound = 0;
-		this.audioAssetsLoaded = 0;
+	for (var audio in this.audioAssets) {
+		this.audioAssets[audio].destroy();
+		this.audioAssets[audio] = undefined;
 	}
 
-	if (videoXMLfilename == null) {
-		this.videoAssetsFound = -1;
-		this.videoAssetsLoaded = -1;
-	}
-	else {
-		this.videoAssetsFound = 0;
-		this.videoAssetsLoaded = 0;
+	for (var video in this.videoAssets) {
+		this.videoAssets[video].destroy();
+		this.videoAssets[video] = undefined;
 	}
 
-	if (this.imageAssetsFound == 0) {
-		this.loadImageAssetXML(imageXMLfilename);
-	}
+	this.imageAssetsFound = -1;
+	this.imageAssetsLoaded = -1;
 
-	if (this.audioAssetsFound == 0) {
-		this.loadAudioAssetXML(audioXMLfilename);
-	}
+	this.audioAssetsFound = -1;
+	this.audioAssetsLoaded = -1;
 
-	if (this.videoAssetsFound == 0) {
-		this.loadVideoAssetXML(videoXMLfilename);
-	}
+	this.videoAssetsFound = -1;
+	this.videoAssetsLoaded = -1;
+
+	this.loading = false;
+
+	LOG.write("All assets unloaded.", LOG.SYSTEM);
 }

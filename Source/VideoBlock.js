@@ -295,6 +295,8 @@ VideoBlock.prototype.undraw = function(dest) {
 VideoBlock.prototype.update = function() {
 	ActorBlock.prototype.update.call(this);
 
+	if (this.isMarkedForDestruction) return;
+
 	this._setVideo(this.video);
 	this._setShattered(this.shattered);
 }
@@ -381,5 +383,5 @@ VideoBlock.prototype.destroy = function() {
 		this._setShattered(undefined);
 	}
 
-	PlayerBlock.prototype.destroy.call(this);
+	ActorBlock.prototype.destroy.call(this);
 }
